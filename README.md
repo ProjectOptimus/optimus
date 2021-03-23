@@ -1,6 +1,11 @@
 optimus
 =======
 
+<!-- badges: start -->
+[![Github Actions](https://github.com/ProjectOptimus/optimus/workflows/test-optimus/badge.svg)](https://github.com/ProjectOptimus/optimus/actions)
+[![Support me on Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/ryapric)
+<!-- badges: end -->
+
 Roadmap
 -------
 
