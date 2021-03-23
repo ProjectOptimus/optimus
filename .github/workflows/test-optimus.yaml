@@ -1,0 +1,28 @@
+name: test-optimus
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test-optimus:
+    name: ${{ matrix.config.os }}
+    runs-on: ${{ matrix.config.os }}
+
+    strategy:
+      matrix:
+        config:
+          - {os: ubuntu-latest}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Sysinit
+        shell: bash init.sh
+      - name: Test
+        shell: make test
