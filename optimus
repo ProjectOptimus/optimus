@@ -12,6 +12,7 @@ target="${1:-.}"
 # }
 
 function optimus-lint() {
+  rm -rf /tmp/optimus-lint-failures
   for linter in linters/*; do
     bash "${linter}" "${target}" || printf "1" >> /tmp/optimus-lint-failures
   done
