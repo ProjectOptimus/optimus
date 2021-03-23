@@ -13,8 +13,12 @@ target="${1:-.}"
 
 function optimus-lint() {
   for linter in linters/*; do
-    bash "${linter}" "${target}"
+    bash "${linter}" "${target}" || printf "1" >> /tmp/optimus-lint-failures
   done
+  if [[ -s /tmp/optimus-lint-failures ]]; then
+    printf "\nERROR: optimus-lint failures detected!\n" 
+    exit 1
+  fi
 }
 
 function main() {
