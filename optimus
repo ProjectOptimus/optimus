@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Take path as first arg, but default to current dir
+target="${1:-.}"
+
+# function get-plugins() {
+#   printf "Using %s for plugins\n" "${OPTIMUS_PLUGIN_DIR:=${HOME}/optimus-plugins}"
+#   for plugin in "${OPTIMUS_PLUGIN_DIR}"/*; do
+#     echo "${plugin}"
+#   done
+# }
+
+function optimus-lint() {
+  for linter in linters/*; do
+    bash "${linter}" "${target}"
+  done
+}
+
+function main() {
+  optimus-lint
+}
+
+main

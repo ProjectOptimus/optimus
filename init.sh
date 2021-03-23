@@ -49,7 +49,7 @@ function init-ruby() {
 
 function test-init() {
   printf "\nRunning tests on init results...\n"
-  bats test-init.bats || errorf "Init tests failed!"
+  bats tests/test-init.bats || errorf "Init tests failed!"
 }
 
 function main() {
