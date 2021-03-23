@@ -23,6 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Sysinit
-        shell: bash init.sh
+        run: bash init.sh
       - name: Test
-        shell: make test
+        run: make test
