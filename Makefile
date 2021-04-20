@@ -1,9 +1,9 @@
 SHELL = /usr/bin/env bash -euo pipefail
 
 test:
-	@printf "\n=== Running optimus tests ===\n\n"
-	@bats ./tests/test-optimus-linters.bats
+	@printf "\n=== Running rhad tests ===\n\n"
+	@bats ./tests/test-rhad-linters.bats
 	@printf "============ DONE ===========\n\n"
 
 docker-build:
-	@docker build -t optimus:latest .
+	@docker build -t rhad:latest .

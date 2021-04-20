@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Take path as first arg, but default to current dir
+target="${1:-.}"
+
+# function get-plugins() {
+#   printf "Using %s for plugins\n" "${OPTIMUS_PLUGIN_DIR:=${HOME}/rhad-plugins}"
+#   for plugin in "${OPTIMUS_PLUGIN_DIR}"/*; do
+#     echo "${plugin}"
+#   done
+# }
+
+function rhad-lint() {
+  rm -rf /tmp/rhad-lint-failures
+  for linter in linters/*; do
+    bash "${linter}" "${target}" || printf "1" >> /tmp/rhad-lint-failures
+  done
+  if [[ -s /tmp/rhad-lint-failures ]]; then
+    printf "\nERROR: rhad-lint failures detected!\n" 
+    exit 1
+  fi
+}
+
+function main() {
+  rhad-lint
+}
+
+main

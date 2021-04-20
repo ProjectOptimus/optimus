@@ -1,8 +1,8 @@
 #!/usr/bin/env bats
 
 function make-test() {
-  ./optimus tests/testfiles/"$1"
-  run ./optimus tests/testfiles/"$2"
+  ./rhad tests/testfiles/"$1"
+  run ./rhad tests/testfiles/"$2"
   [ "${status}" -ne 0 ]
   if [[ "${output}" == *"such file or directory"* ]]; then
     printf "%s\n" "${output}"

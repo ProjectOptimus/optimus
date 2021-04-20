@@ -20,7 +20,7 @@ function init-sys() {
     python3-venv \
     ruby-full \
     shellcheck \
-  || errorf "Could not init system packages for optimus!"
+  || errorf "Could not init system packages for rhad!"
 
   rm -rf /var/cache/apt/*
 }
@@ -36,7 +36,7 @@ function init-python() {
     pylint \
     pytest \
     pytest-cov \
-  || errorf "Could not init Python packages for optimus!"
+  || errorf "Could not init Python packages for rhad!"
 
   rm -rf "${HOME}/.cache/pip"
 }
@@ -44,7 +44,7 @@ function init-python() {
 function init-ruby() {
   gem install \
     mdl \
-  || errorf "Could not init Ruby packages for optimus!"
+  || errorf "Could not init Ruby packages for rhad!"
 }
 
 function test-init() {
@@ -60,6 +60,6 @@ function main() {
   test-init
 }
 
-main || errorf "Failed to initialize optimus host!"
+main || errorf "Failed to initialize rhad host!"
 
 exit 0

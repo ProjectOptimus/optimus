@@ -1,8 +1,8 @@
-optimus
+rhad
 =======
 
 <!-- badges: start -->
-[![Github Actions](https://github.com/ProjectOptimus/optimus/workflows/test-optimus/badge.svg)](https://github.com/ProjectOptimus/optimus/actions)
+[![Github Actions](https://github.com/ProjectOptimus/rhad/workflows/test-rhad/badge.svg)](https://github.com/ProjectOptimus/rhad/actions)
 [![Support me on Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/ryapric)
 <!-- badges: end -->
 
