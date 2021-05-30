@@ -21,8 +21,6 @@ function init-sys() {
     ruby-full \
     shellcheck \
   || errorf "Could not init system packages for rhad!"
-
-  rm -rf /var/cache/apt/*
 }
 
 function init-bats() {
@@ -37,8 +35,6 @@ function init-python() {
     pytest \
     pytest-cov \
   || errorf "Could not init Python packages for rhad!"
-
-  rm -rf "${HOME}/.cache/pip"
 }
 
 function init-ruby() {
