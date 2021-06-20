@@ -1,4 +1,4 @@
-name: test-optimus
+name: test-rhad
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - develop
 
 jobs:
-  test-optimus:
+  test-rhad:
     name: ${{ matrix.config.os }}
     runs-on: ${{ matrix.config.os }}
 
