@@ -43,17 +43,11 @@ function init-ruby() {
   || errorf "Could not init Ruby packages for rhad!"
 }
 
-function test-init() {
-  printf "\nRunning tests on init results...\n"
-  bats tests/test-init.bats || errorf "Init tests failed!"
-}
-
 function main() {
   init-sys
   init-bats
   init-python
   init-ruby
-  test-init
 }
 
 main || errorf "Failed to initialize rhad host!"

@@ -3,16 +3,17 @@ rhad
 
 <!-- badges: start -->
 [![Github Actions](https://github.com/opensourcecorp/rhad/workflows/test-rhad/badge.svg)](https://github.com/opensourcecorp/rhad/actions)
-[![Support me on Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/ryapric)
+[![Support OpenSourceCorp on Ko-Fi!](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/ryapric)
 <!-- badges: end -->
 
 ---
 
-*Thou shalt be judged.*
+*King Rhadamanthus has found you worthy -- King Minos, God of War 3*
 
 ---
 
-Custom linter aggregator, named after the Judge of the Underworld King Rhadamanthus. Also, the CLI command is `r(h)ad`. sdsd sd sd s
+Custom linter aggregator, named after the Judge of the Greek Underworld King
+Rhadamanthus.
 
 Roadmap
 -------

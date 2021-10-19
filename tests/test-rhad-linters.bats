@@ -1,9 +1,12 @@
 #!/usr/bin/env bats
 
 function make-test() {
-  ./rhad tests/testfiles/"$1"
-  run ./rhad tests/testfiles/"$2"
-  [ "${status}" -ne 0 ]
+  # Direct invocation will fail on tests that SHOULD pass
+  ../scripts/rhad ../tests/testfiles/"$1"
+  # Invocation via `run` in bats will pass on tests that SHOULD fail
+  run ../scripts/rhad ../tests/testfiles/"$2"
+
+  [[ "${status}" -ne 0 ]]
   if [[ "${output}" == *"such file or directory"* ]]; then
     printf "%s\n" "${output}"
     exit 1

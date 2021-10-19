@@ -13,7 +13,7 @@ target="${1:-.}"
 
 function rhad-lint() {
   rm -rf /tmp/rhad-lint-failures
-  for linter in linters/*; do
+  for linter in ../linters/*; do
     bash "${linter}" "${target}" || printf "1" >> /tmp/rhad-lint-failures
   done
   if [[ -s /tmp/rhad-lint-failures ]]; then
