@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         config:
-          - {os: debian-latest}
+          - {os: ubuntu-latest}
 
     steps:
       - uses: actions/checkout@v2
