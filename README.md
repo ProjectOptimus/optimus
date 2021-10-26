@@ -2,7 +2,8 @@ rhad
 ====
 
 <!-- badges: start -->
-[![Github Actions](https://github.com/opensourcecorp/rhad/workflows/test-rhad/badge.svg)](https://github.com/opensourcecorp/rhad/actions)
+![Github Actions](https://github.com/opensourcecorp/rhadamanthus/actions/workflows/test-rhad.yaml/badge.svg)
+
 [![Support OpenSourceCorp on Ko-Fi!](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/ryapric)
 <!-- badges: end -->
 
