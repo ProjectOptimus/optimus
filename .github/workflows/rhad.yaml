@@ -1,4 +1,4 @@
-name: test-rhad
+name: rhad
 
 on:
   push:
