@@ -20,7 +20,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Init
-        run: sudo bash scripts/init.sh
-      - name: Test
-        run: make test
+      - name: Build & test
+        run: make image-build
