@@ -13,18 +13,18 @@ make-test() {
   fi
 }
 
-@test "can lint Shell" {
+@test "Can lint Shell" {
   make-test shell-{good,bad}.sh shell
 }
 
-@test "can lint Go" {
+@test "Can lint Go" {
   make-test go_{good,bad}.go go
 }
 
-@test "can lint Python" {
+@test "Can lint Python" {
   make-test python{_good,-bad}.py python
 }
 
-@test "can lint Markdown" {
+@test "Can lint Markdown" {
   make-test markdown-{good,bad}.md markdown
 }
