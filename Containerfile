@@ -13,6 +13,10 @@ COPY Makefile Makefile
 COPY scripts/ scripts/
 COPY linters/ linters/
 COPY tests/ tests/
+
+# rhad needs to be on PATH for its `realpath` call to work
+RUN chmod +x /root/scripts/rhad && \
+    ln -fs /root/scripts/rhad /usr/bin/rhad
 RUN make test && \
     rm -rf *cache* .*cache*
 

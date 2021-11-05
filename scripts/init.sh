@@ -3,16 +3,17 @@ set -euo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
-function errorf() {
+errorf() {
   printf "ERROR: %s\n" "$@" > /dev/stderr
   exit 1
 }
 
-function init-sys() {
+init-sys() {
   apt-get update
   apt-get install -y \
     curl \
     git \
+    golang \
     make \
     npm \
     python3 \
@@ -23,12 +24,24 @@ function init-sys() {
   || errorf "Could not init system packages for rhad!"
 }
 
-function init-bats() {
+init-bats() {
   git clone https://github.com/bats-core/bats-core.git /tmp/bats
-  /tmp/bats/install.sh /usr/local
+  bash /tmp/bats/install.sh /usr/local
 }
 
-function init-python() {
+init-go() {
+  pkgs=(
+    # golang.org/x/lint/golint
+    honnef.co/go/tools/cmd/staticcheck
+  )
+  for pkg in "${pkgs[@]}"; do
+    go install \
+      "${pkg}"@latest
+  done
+  ln -fs "$(go env GOPATH)"/bin/* /usr/bin/
+}
+
+init-python() {
   pip3 install \
     mypy \
     pylint \
@@ -37,15 +50,16 @@ function init-python() {
   || errorf "Could not init Python packages for rhad!"
 }
 
-function init-ruby() {
+init-ruby() {
   gem install \
     mdl \
   || errorf "Could not init Ruby packages for rhad!"
 }
 
-function main() {
+main() {
   init-sys
   init-bats
+  init-go
   init-python
   init-ruby
 }

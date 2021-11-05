@@ -6,4 +6,4 @@ test:
 	@printf "======== DONE\n\n"
 
 image-build:
-	@docker build -f Containerfile -t rhad:latest .
+	@docker build -f Containerfile -t opensourcecorp/rhad:latest .

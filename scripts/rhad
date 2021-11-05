@@ -1,23 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Need to know where rhad root ACTUALLY lives on disk -- this looks gross, but
+RHAD_ROOT="$(dirname "$(dirname "$(realpath "$(command -v rhad)")")")"
+export RHAD_ROOT
+
 # Take path as first arg, but default to current dir
 target="${1:-.}"
 
+# Only run for a certain language ecosystem (useful for testing)
+lang="${2:-}"
+
 # function get-plugins() {
-#   printf "Using %s for plugins\n" "${OPTIMUS_PLUGIN_DIR:=${HOME}/rhad-plugins}"
-#   for plugin in "${OPTIMUS_PLUGIN_DIR}"/*; do
+#   printf "Using %s for rhad plugins\n" "${RHAD_PLUGIN_DIR:=${HOME}/rhad-plugins}"
+#   for plugin in "${RHAD_PLUGIN_DIR}"/*; do
 #     echo "${plugin}"
 #   done
 # }
 
 function rhad-lint() {
   rm -rf /tmp/rhad-lint-failures
-  for linter in ../linters/*; do
+  # shellcheck disable=2043
+  for linter in "${RHAD_ROOT}"/linters/"${lang}"* ; do
     bash "${linter}" "${target}" || printf "1" >> /tmp/rhad-lint-failures
   done
   if [[ -s /tmp/rhad-lint-failures ]]; then
-    printf "\nERROR: rhad-lint failures detected!\n" 
+    printf "\n>>>>>>>> ERROR: rhad-lint failures detected!\n" 
     exit 1
   fi
 }

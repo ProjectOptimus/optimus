@@ -1,9 +1,9 @@
 #!/usr/bin/env bats
 
-@test "can test shell" {
+@test "Can test Go" {
   printf 'NOT IMPLEMENTED\n'
 }
 
-@test "can test Python" {
+@test "Can test Python" {
   printf 'NOT IMPLEMENTED\n'
 }

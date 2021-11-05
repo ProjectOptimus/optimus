@@ -3,12 +3,10 @@ name: rhad
 on:
   push:
     branches:
-      - main
-      - develop
+      - '**'
   pull_request:
     branches:
-      - main
-      - develop
+      - '**'
 
 jobs:
   test-rhad:
@@ -22,7 +20,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Sysinit
+      - name: Init
         run: sudo bash scripts/init.sh
       - name: Test
         run: make test
