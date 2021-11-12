@@ -7,7 +7,9 @@ file_list=$(find "$1" -type f -name '*.py')
 for f in ${file_list}; do
   printf '>>>>>>>> Running Python linter against %s...\n' "${f}"
   pylint "${f}"
-done 
+done
 
 printf '>>>>>>>> Running Python typechecker...\n'
-mypy "$1"
+if [[ "${#file_list}" -gt 0 ]]; then
+  mypy "$1"
+fi
