@@ -2,4 +2,4 @@
 set -euo pipefail
 
 printf '>>>>>>>> Running Markdown linter...\n'
-mdl "$1"
+mdl --style /root/linters/.mdlrc.style.rb "$1"
