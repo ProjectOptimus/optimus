@@ -9,7 +9,7 @@ for f in ${file_list}; do
   pylint "${f}"
 done
 
-printf '>>>>>>>> Running Python typechecker...\n'
 if [[ "${#file_list}" -gt 0 ]]; then
+  printf '>>>>>>>> Running Python typechecker...\n'
   mypy "$1"
 fi
