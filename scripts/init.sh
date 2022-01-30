@@ -43,6 +43,7 @@ init-go() {
 
 init-python() {
   pip3 install \
+    black \
     mypy \
     pylint \
     pytest \
