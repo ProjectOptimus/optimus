@@ -1,4 +1,5 @@
 SHELL = /usr/bin/env bash -euo pipefail
+DOCKER ?= docker
 
 test:
 	@printf "\n======== Running rhad tests\n\n"
@@ -6,4 +7,4 @@ test:
 	@printf "======== DONE\n\n"
 
 image-build:
-	@docker build -f Containerfile -t opensourcecorp/rhadamanthus:latest .
+	@$(DOCKER) build -f Containerfile -t opensourcecorp/rhadamanthus:latest .
