@@ -1,6 +1,6 @@
 SHELL = /usr/bin/env bash -euo pipefail
 DOCKER ?= docker
-REGISTRY ?= localhost
+REGISTRY ?= sauce.opensourcecorp.org
 
 test:
 	@printf "\n================ Running rhad tests\n\n"

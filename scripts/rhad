@@ -14,27 +14,54 @@ target="${1:-.}"
 # Only run for a certain language ecosystem (useful for testing)
 lang="${2:-}"
 
-# function get-plugins() {
+# get-plugins() {
 #   printf "Using %s for rhad plugins\n" "${RHAD_PLUGIN_DIR:=${HOME}/rhad-plugins}"
 #   for plugin in "${RHAD_PLUGIN_DIR}"/*; do
 #     echo "${plugin}"
 #   done
 # }
 
-function rhad-lint() {
+# Using this, we can run all subfuncs without exiting early
+rm -rf /tmp/rhad-all-failures
+try-to() {
+  touch /tmp/rhad-all-failures
+  "$1" || printf "fail\n" >> /tmp/rhad-all-failures
+}
+
+rhad-lint() {
   rm -rf "${failed_lint_logfile:-}"
+
   # shellcheck disable=2043
   for linter in "${RHAD_ROOT}"/linters/"${lang}"* ; do
-    bash "${linter}" "${target}" # || printf '%s\n' "${lang}" >> /tmp/rhad-lint-failures
+    bash "${linter}" "${target}"
   done
   if [[ -s "${failed_lint_logfile}" ]]; then
     printf "\n>>>>>>>> ERROR: rhad linting failures detected!\n" 
-    exit 1
+    return 1
   fi
 }
 
-function main() {
-  rhad-lint
+rhad-test() {
+  if [[ -d /root/src ]]; then
+    printf '>>>>>>>> Running test suite for repo...\n'
+    make -s -C /root/src test || {
+      printf ">>>>>>>> ERROR: either your test suite failed, or you do not have a Makefile target called 'test' in your repo\n"
+      return 1
+    }
+  else
+    # If there's no /root/src, the OCI image is still building
+    return 0
+  fi
+}
+
+main() {
+  try-to rhad-lint
+  try-to rhad-test
+
+  if [[ -s /tmp/rhad-all-failures ]]; then
+    printf '>>>>>>>> ERROR: one or more overall rhad failures detected!\n'
+    return 1
+  fi
 }
 
 main
