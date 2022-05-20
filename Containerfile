@@ -1,27 +1,31 @@
 FROM debian:unstable 
 
-WORKDIR /root
+RUN mkdir -p /root/rhad && \
+    ln -fs /root/rhad /usr/local/rhad
 
-# init via scripts instead of Containerfile lines, so rhad can still be
-# installed via other targets/patterns
-COPY scripts/init.sh scripts/init.sh
-RUN bash scripts/init.sh && \
-    rm -rf /var/cache/apt/* && \
-    rm -rf *cache* .*cache*
+WORKDIR /root/rhad
 
-COPY Makefile Makefile
-COPY scripts/ scripts/
-COPY linters/ linters/
-COPY tests/ tests/
+RUN apt-get update && apt-get install -y \
+        golang \
+        make && \
+    rm -rf /var/cache/apt/*
 
-# rhad needs to be on PATH for its `realpath` call to work
-RUN chmod +x /root/scripts/rhad && \
-    ln -fs /root/scripts/rhad /usr/bin/rhad
-RUN make test && \
-    rm -rf *cache* .*cache*
+COPY Makefile .
+COPY *.go .
+COPY go.mod .
+# COPY go.sum .
+COPY scripts/ .
+COPY linters/ .
+COPY tests/ .
 
-RUN mkdir -p /root/src
-WORKDIR /root/src
+RUN ls -l && make test clean
 
-ENTRYPOINT ["/root/scripts/rhad"]
-CMD ["."]
+RUN make build && ln -fs build/linux-amd64/rhad ./rhad
+
+RUN /usr/local/rhad/rhad sysinit
+
+RUN mkdir -p /root/rhad/src
+WORKDIR /root/rhad/src
+
+ENTRYPOINT ["/usr/local/rhad/rhad"]
+CMD ["run", "."]
