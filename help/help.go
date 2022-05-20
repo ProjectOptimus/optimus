@@ -1,13 +1,17 @@
-package main
+// Package help consolidates helptext strings for the CLI commands
+package help
 
 import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/opensourcecorp/rhadamanthus/logging"
 )
 
-// Printing spacing is kind of wonky, so be sure to check it in advance
-func showHelp(subcommand string, exitCode int) {
+// Columnar spacing is kind of wonky at print-time, so be sure to check it in
+// advance
+func ShowHelp(subcommand string, exitCode int) {
 	var helpText string
 
 	switch subcommand {
@@ -15,7 +19,7 @@ func showHelp(subcommand string, exitCode int) {
 		helpText = `rhad -- CI/CD task runner for OpenSourceCorp
 
 Usage:
-	rhad [-h|-help|--help|help] <subcommand>
+	rhad [help] <subcommand>
 
 Subcommands:
 	run     <[all] | lint | test | build | push | deploy>
@@ -37,7 +41,7 @@ Usage:
 	[help]			Show more detailed help
 
 Subcommands:
-	all		Run *all* the subcommands. The default subcommand.
+	all		Run *all* the subcommands. This is the default.
 	lint		Run linters.
 	test		Run 'make test' target.
 	build		Run 'make build' target.
@@ -45,7 +49,7 @@ Subcommands:
 	deploy		Run deployment(s)`
 
 	default:
-		ErrorLog.Fatalln("How did you even get here?")
+		logging.Error("How did you even get here?")
 	}
 
 	fmt.Println(strings.TrimSpace(helpText))

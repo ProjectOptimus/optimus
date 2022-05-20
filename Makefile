@@ -4,14 +4,15 @@ PKGNAME := rhadamanthus
 BINNAME := rhad
 
 DOCKER ?= docker
-REGISTRY ?= sauce.opensourcecorp.org
+OCI_REGISTRY ?= ociregistry.opensourcecorp.org
+OCI_REGISTRY_OWNER ?= library
 
 all: test clean
 
 .PHONY: %
 
 test: clean
-	@go test -v -cover ./...
+	@go test -v -cover
 
 build: clean
 	@mkdir -p build/$$(go env GOOS)-$$(go env GOARCH)
@@ -31,7 +32,7 @@ xbuild: clean
 		outdir=build/"$${GOOS}-$${GOARCH}" ; \
 		mkdir -p "$${outdir}" ; \
 		printf "Building for %s-%s into build/ ...\n" "$${GOOS}" "$${GOARCH}" ; \
-		GOOS="$${GOOS}" GOARCH="$${GOARCH}" go build -o "$${outdir}"/$(BINNAME) ./... ; \
+		GOOS="$${GOOS}" GOARCH="$${GOARCH}" go build -o "$${outdir}"/$(BINNAME) ; \
 	done
 
 package: xbuild
@@ -51,4 +52,4 @@ clean:
 		dist/
 
 image-build:
-	@$(DOCKER) build -f Containerfile -t $(REGISTRY)/opensourcecorp/rhadamanthus:latest .
+	@$(DOCKER) build -f Containerfile -t $(OCI_REGISTRY)/$(OCI_REGISTRY_OWNER)/rhadamanthus:latest .

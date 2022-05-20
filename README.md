@@ -19,13 +19,3 @@ utilities that are designed to be easily ported between any CI/CD platform of
 your choosing. You can think of `rhad` as all the CI/CD logic that your platform
 would normally run as steps in that process -- lint, test, build, push, deploy,
 etc. In this way, `rhad` is much like a Jenkins shared library.
-
-Roadmap
--------
-
-- Installer for runtimes/tools required by static analyzers
-
-- Heuristics for applicable file types independent of file extension (e.g. like
-  how CloudFormation requires a CFN-specific key, even if it has no extension)
-
-- Plugin system to alow for tools not available ootb

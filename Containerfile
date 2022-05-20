@@ -1,31 +1,26 @@
-FROM debian:unstable 
+FROM debian:unstable
 
-RUN mkdir -p /root/rhad && \
-    ln -fs /root/rhad /usr/local/rhad
+# Go's staticcheck linter complains unless this is set
+ENV GOFLAGS -buildvcs=false
 
-WORKDIR /root/rhad
+# rhad has a sysinit subcommand, but all the needed COPY directives are a lot to
+# keep up with when files change, so just call the same script directly, early
+COPY ./scripts/sysinit.sh ./scripts/sysinit.sh
+RUN bash ./scripts/sysinit.sh
 
-RUN apt-get update && apt-get install -y \
-        golang \
-        make && \
-    rm -rf /var/cache/apt/*
+RUN adduser --gecos "" rhad
+USER rhad
+WORKDIR /home/rhad
 
-COPY Makefile .
-COPY *.go .
-COPY go.mod .
-# COPY go.sum .
-COPY scripts/ .
-COPY linters/ .
-COPY tests/ .
+COPY . .
 
-RUN ls -l && make test clean
+RUN make test clean
 
-RUN make build && ln -fs build/linux-amd64/rhad ./rhad
+RUN make build && \
+    ln -fs build/linux-amd64/rhad ./rhad
 
-RUN /usr/local/rhad/rhad sysinit
+RUN mkdir -p /home/rhad/src
+WORKDIR /home/rhad/src
 
-RUN mkdir -p /root/rhad/src
-WORKDIR /root/rhad/src
-
-ENTRYPOINT ["/usr/local/rhad/rhad"]
-CMD ["run", "."]
+ENTRYPOINT ["/home/rhad/rhad"]
+CMD ["run", "all"]
