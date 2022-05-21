@@ -14,13 +14,18 @@ WORKDIR /home/rhad
 
 COPY . .
 
+# Sets up the rest of the non-root-needed installs; the script checks if the runner is root or not
+RUN bash ./scripts/sysinit.sh
+
 RUN make test clean
 
 RUN make build && \
     ln -fs build/linux-amd64/rhad ./rhad
 
-RUN mkdir -p /home/rhad/src
+RUN mkdir -p /home/rhad/src /home/rhad/.local/bin
 WORKDIR /home/rhad/src
+
+ENV PATH /home/rhad/.local/bin:${PATH}
 
 ENTRYPOINT ["/home/rhad/rhad"]
 CMD ["run", "all"]

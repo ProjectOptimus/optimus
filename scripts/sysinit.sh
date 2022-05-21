@@ -38,11 +38,12 @@ init-go() {
     go install \
       "${pkg}"@latest
   done
-  ln -fs "$(go env GOPATH)"/bin/* /usr/bin/
+  mkdir -p "${HOME}"/.local/bin/
+  ln -fs "$(go env GOPATH)"/bin/* "${HOME}"/.local/bin/
 }
 
 init-python() {
-  pip3 install \
+  pip3 install --user \
     black \
     mypy \
     pylint \
@@ -58,11 +59,14 @@ init-ruby() {
 }
 
 main() {
-  init-sys
-  init-bats
-  init-go
-  init-python
-  init-ruby
+  if [[ $(id -u) -eq 0 ]]; then
+    init-sys
+    init-bats
+  else  
+    init-go
+    init-python
+    init-ruby
+  fi
 }
 
 main || errorf "Failed to initialize rhad host!"
