@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/opensourcecorp/rhadamanthus/help"
-	"github.com/opensourcecorp/rhadamanthus/logging"
-	"github.com/opensourcecorp/rhadamanthus/run"
+	"github.com/opensourcecorp/rhad/help"
+	"github.com/opensourcecorp/rhad/logging"
+	"github.com/opensourcecorp/rhad/run"
 )
 
 func main() {
