@@ -60,15 +60,19 @@ init-ruby() {
 
 test-sysinit() {
   cmds=(
+    black
     curl
     git
     go
     make
+    mdl
+    mypy
     npm
     python3
     pip3
     ruby
     shellcheck
+    staticcheck
   )
   for cmd in "${cmds[@]}"; do
     command -v "${cmd}" >/dev/null || {
@@ -76,8 +80,6 @@ test-sysinit() {
       return 1
     }
   done
-
-  python3 -m venv -h > /dev/null
 }
 
 main() {
@@ -88,9 +90,10 @@ main() {
   else  
     init-go
     init-python
+    
+    # Also run tests as nonroot, so setup is confirmed for the least-privileged user
+    test-sysinit
   fi
-
-  test-sysinit
 }
 
 main || errorf "Failed to initialize rhad host!"

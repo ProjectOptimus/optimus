@@ -12,7 +12,6 @@ import (
 type cliOptsStruct struct {
 	path          *string
 	ignorePattern *string
-	testing       bool
 }
 
 type cfgFileData map[string]any
@@ -41,7 +40,6 @@ func Run() {
 	cliOpts := cliOptsStruct{
 		path,
 		ignorePattern,
-		false,
 	}
 
 	cfgFileData := readConfig()

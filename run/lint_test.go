@@ -16,8 +16,7 @@ var (
 	cfg = rhadConfig{
 		map[string]any{"": ""},
 		cliOptsStruct{
-			path:    &rootPath,
-			testing: true,
+			path: &rootPath,
 		},
 	}
 
