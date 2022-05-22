@@ -1,5 +1,7 @@
-# Dunno, I mostly copied this straight from here:
+# I mostly copied this straight from here:
 # https://docs.github.com/en/actions/publishing-packages/publishing-docker-images
+
+# rhad's tests, etc. run during image build, so that's all this pipeline does
 
 name: main
 
@@ -29,7 +31,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     # Generate any tags we want for the images (https://github.com/docker/build-push-action/blob/master/docs/advanced/tags-labels.md)
-    - name: Extract metadata (tags, labels) for Docker
+    - name: Extract metadata (tags, labels) for OCI image
       id: meta
       uses: docker/metadata-action@v4
       with:
@@ -38,7 +40,7 @@ jobs:
           type=sha
 
     # non-mainline
-    - name: Build and push Docker image
+    - name: Build and push non-mainline OCI image
       if: github.ref != 'main'
       uses: docker/build-push-action@v3
       with:
@@ -48,7 +50,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
 
     # mainline
-    - name: Build and push Docker image
+    - name: Build and push mainline OCI image
       if: github.ref == 'main'
       uses: docker/build-push-action@v3
       with:
