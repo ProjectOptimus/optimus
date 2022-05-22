@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/opensourcecorp/rhadamanthus/logging"
+	"github.com/opensourcecorp/rhad/logging"
 )
 
 type fileData struct {

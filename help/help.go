@@ -6,14 +6,15 @@ import (
 	"os"
 	"strings"
 
-	"github.com/opensourcecorp/rhadamanthus/logging"
+	"github.com/opensourcecorp/rhad/logging"
 )
 
-// Columnar spacing is kind of wonky at print-time, so be sure to check it in
-// advance
+// ShowHelp prints CLI help strings and then exits accordingly
 func ShowHelp(subcommand string, exitCode int) {
 	var helpText string
 
+	// Columnar spacing is kind of wonky at print-time, so be sure to check each
+	// of these in advance of publishing
 	switch subcommand {
 
 	//

@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"regexp"
 
-	"github.com/opensourcecorp/rhadamanthus/logging"
+	"github.com/opensourcecorp/rhad/logging"
 )
 
 var (
