@@ -41,7 +41,7 @@ jobs:
 
     # non-mainline
     - name: Build and push non-mainline OCI image
-      if: github.ref != 'main'
+      if: github.ref != 'refs/heads/main'
       uses: docker/build-push-action@v3
       with:
         context: .
@@ -51,7 +51,7 @@ jobs:
 
     # mainline
     - name: Build and push mainline OCI image
-      if: github.ref == 'main'
+      if: github.ref == 'refs/heads/main'
       uses: docker/build-push-action@v3
       with:
         context: .
