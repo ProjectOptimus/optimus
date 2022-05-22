@@ -38,11 +38,12 @@ init-go() {
     go install \
       "${pkg}"@latest
   done
-  ln -fs "$(go env GOPATH)"/bin/* /usr/bin/
+  mkdir -p "${HOME}"/.local/bin/
+  ln -fs "$(go env GOPATH)"/bin/* "${HOME}"/.local/bin/
 }
 
 init-python() {
-  pip3 install \
+  pip3 install --user \
     black \
     mypy \
     pylint \
@@ -57,12 +58,42 @@ init-ruby() {
   || errorf "Could not init Ruby packages for rhad!"
 }
 
+test-sysinit() {
+  cmds=(
+    black
+    curl
+    git
+    go
+    make
+    mdl
+    mypy
+    npm
+    python3
+    pip3
+    ruby
+    shellcheck
+    staticcheck
+  )
+  for cmd in "${cmds[@]}"; do
+    command -v "${cmd}" >/dev/null || {
+      errorf "Command '%s' not found" "${cmd}"
+      return 1
+    }
+  done
+}
+
 main() {
-  init-sys
-  init-bats
-  init-go
-  init-python
-  init-ruby
+  if [[ $(id -u) -eq 0 ]]; then
+    init-sys
+    init-bats
+    init-ruby
+  else  
+    init-go
+    init-python
+    
+    # Also run tests as nonroot, so setup is confirmed for the least-privileged user
+    test-sysinit
+  fi
 }
 
 main || errorf "Failed to initialize rhad host!"

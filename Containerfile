@@ -1,27 +1,32 @@
-FROM debian:unstable 
+FROM debian:unstable
 
-WORKDIR /root
+# Go's staticcheck linter complains unless this is set
+ENV GOFLAGS -buildvcs=false
 
-# init via scripts instead of Containerfile lines, so rhad can still be
-# installed via other targets/patterns
-COPY scripts/init.sh scripts/init.sh
-RUN bash scripts/init.sh && \
-    rm -rf /var/cache/apt/* && \
-    rm -rf *cache* .*cache*
+COPY ./scripts/sysinit.sh ./scripts/sysinit.sh
+RUN bash ./scripts/sysinit.sh
 
-COPY Makefile Makefile
-COPY scripts/ scripts/
-COPY linters/ linters/
-COPY tests/ tests/
+RUN useradd --create-home rhad
+USER rhad
+WORKDIR /home/rhad
 
-# rhad needs to be on PATH for its `realpath` call to work
-RUN chmod +x /root/scripts/rhad && \
-    ln -fs /root/scripts/rhad /usr/bin/rhad
-RUN make test && \
-    rm -rf *cache* .*cache*
+# Set up PATH correctly for rhad user (I can't find a better way to do this)
+ENV PATH="/home/rhad/.local/bin:/home/rhad/go/bin:${PATH}"
 
-RUN mkdir -p /root/src
-WORKDIR /root/src
+# Sets up the rest of the non-root-needed installs; the script checks if the runner is root or not
+COPY ./scripts/sysinit.sh ./scripts/sysinit.sh
+RUN bash ./scripts/sysinit.sh
 
-ENTRYPOINT ["/root/scripts/rhad"]
-CMD ["."]
+# Ok now hopefully we're all cached up
+COPY . .
+
+RUN RHAD_TESTING=true make test clean
+
+RUN make build && \
+    ln -fs build/linux-amd64/rhad ./rhad
+
+RUN mkdir -p /home/rhad/src /home/rhad/.local/bin
+WORKDIR /home/rhad/src
+
+ENTRYPOINT ["/home/rhad/rhad"]
+CMD ["run", "all"]
