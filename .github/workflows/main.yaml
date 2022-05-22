@@ -1,24 +1,86 @@
-name: rhad
+# Dunno, I mostly copied this straight from here:
+# https://docs.github.com/en/actions/publishing-packages/publishing-docker-images
+
+name: main
 
 on:
   push:
-    branches:
-    - '**'
-  pull_request:
-    branches:
-    - '**'
+    branches: ['**']
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   main:
-    name: ${{ matrix.config.os }}
-    runs-on: ${{ matrix.config.os }}
-
-    strategy:
-      matrix:
-        config:
-        - {os: ubuntu-latest}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Build & test
-      run: make image-build
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Log in to the Container registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    # Generate any tags we want for the images (https://github.com/docker/build-push-action/blob/master/docs/advanced/tags-labels.md)
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=sha
+
+    - name: Build and push Docker image
+      if: github.ref != 'main'
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: Containerfile
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+
+    - name: Build and push Docker image
+      if: github.ref == 'main'
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: Containerfile
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+
+# name: main
+
+# on:
+#   push:
+#     branches:
+#     - '**'
+#   pull_request:
+#     branches:
+#     - '**'
+
+# jobs:
+#   main:
+#     name: ${{ matrix.config.os }}
+#     runs-on: ${{ matrix.config.os }}
+
+#     strategy:
+#       matrix:
+#         config:
+#         - {os: ubuntu-latest}
+
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Build & test
+#       run: make image-build
