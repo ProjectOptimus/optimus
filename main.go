@@ -6,7 +6,6 @@ import (
 	"github.com/opensourcecorp/rhadamanthus/help"
 	"github.com/opensourcecorp/rhadamanthus/logging"
 	"github.com/opensourcecorp/rhadamanthus/run"
-	"github.com/opensourcecorp/rhadamanthus/sysinit"
 )
 
 func main() {
@@ -16,10 +15,8 @@ func main() {
 	}
 
 	switch os.Args[1] {
-	case "-h", "-help", "--help", "help":
+	case "help":
 		help.ShowHelp("main", 0)
-	case "sysinit":
-		sysinit.Sysinit()
 	case "run":
 		run.Run()
 	default:

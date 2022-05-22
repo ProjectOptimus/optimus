@@ -62,10 +62,10 @@ main() {
   if [[ $(id -u) -eq 0 ]]; then
     init-sys
     init-bats
+    init-ruby
   else  
     init-go
     init-python
-    init-ruby
   fi
 }
 

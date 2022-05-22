@@ -1,6 +1,6 @@
 SHELL = /usr/bin/env bash -euo pipefail
 
-PKGNAME := rhadamanthus
+PKGNAME := rhad
 BINNAME := rhad
 
 DOCKER ?= docker
@@ -52,4 +52,4 @@ clean:
 		dist/
 
 image-build:
-	@$(DOCKER) build -f Containerfile -t $(OCI_REGISTRY)/$(OCI_REGISTRY_OWNER)/rhadamanthus:latest .
+	@$(DOCKER) build -f Containerfile -t $(OCI_REGISTRY)/$(OCI_REGISTRY_OWNER)/$(PKGNAME):latest .

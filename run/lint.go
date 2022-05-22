@@ -140,5 +140,7 @@ func Lint(cfg rhadConfig) {
 		logging.Error("One or more failures occurred during rhad's lint run! Summary:")
 		fmt.Println(failures)
 		os.Exit(1)
+	} else {
+		logging.Info("All linters passed!")
 	}
 }
