@@ -12,7 +12,7 @@ all: test clean
 .PHONY: %
 
 test: clean
-	@go test -v -cover
+	@go test -v -cover ./...
 
 build: clean
 	@mkdir -p build/$$(go env GOOS)-$$(go env GOARCH)

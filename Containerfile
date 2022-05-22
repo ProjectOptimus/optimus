@@ -13,10 +13,12 @@ WORKDIR /home/rhad
 # Set up PATH correctly for rhad user (I can't find a better way to do this)
 ENV PATH="/home/rhad/.local/bin:/home/rhad/go/bin:${PATH}"
 
-COPY . .
-
 # Sets up the rest of the non-root-needed installs; the script checks if the runner is root or not
+COPY ./scripts/sysinit.sh ./scripts/sysinit.sh
 RUN bash ./scripts/sysinit.sh
+
+# Ok now hopefully we're all cached up
+COPY . .
 
 RUN make test clean
 

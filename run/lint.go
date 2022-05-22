@@ -24,17 +24,21 @@ type failureMap map[string]string
 func lintShell(cfg rhadConfig) {
 	files := getRelevantFiles(".*\\.sh", cfg)
 	if len(files) > 0 {
-		logging.Info("Running Shellcheck...")
+		if !cfg.cliOpts.testing {
+			logging.Info("Running Shellcheck...")
+		}
 		for _, file := range files {
 			cmd = exec.Command("shellcheck", file.path)
 			output, err = cmd.CombinedOutput()
 			if err != nil {
 				// TODO: we don't want to exit here since a failure could be the
 				// shell return code -- but, it could be something worse, sure
-				fmt.Println(string(output))
-				fmt.Println(err)
-				logging.Error("Shellcheck failed!")
-				failures["shellcheck"] = "fail"
+				if !cfg.cliOpts.testing {
+					fmt.Println(string(output))
+					fmt.Println(err)
+					logging.Error("Shellcheck failed!")
+				}
+				failures["lint-shell"] = "fail"
 			}
 		}
 	}
@@ -43,7 +47,9 @@ func lintShell(cfg rhadConfig) {
 func lintGo(cfg rhadConfig) {
 	files := getRelevantFiles(".*\\.go", cfg)
 	if len(files) > 0 {
-		logging.Info("Running Go format diff check...")
+		if !cfg.cliOpts.testing {
+			logging.Info("Running Go format diff check...")
+		}
 		cmd = exec.Command("gofmt", "-d", *cfg.cliOpts.path)
 		output, err = cmd.CombinedOutput()
 		if err != nil {
@@ -51,19 +57,36 @@ func lintGo(cfg rhadConfig) {
 			fmt.Println(err)
 		}
 		if len(output) > 0 {
-			fmt.Println(string(output))
-			logging.Error("Go format diff check failed!")
+			if !cfg.cliOpts.testing {
+				fmt.Println(string(output))
+				logging.Error("Go format diff check failed!")
+			}
 			failures["fmt-diff-check-go"] = "fail"
 		}
 
-		logging.Info("Running Go linter...")
-		cmd = exec.Command("staticcheck", "./...")
-		cmd.Dir = *cfg.cliOpts.path
+		if !cfg.cliOpts.testing {
+			logging.Info("Running Go linter...")
+		}
+
+		// staticcheck is such a pain in my ass
+		f, err := os.Stat(*cfg.cliOpts.path)
+		if err != nil {
+			logging.Error("I have no idea what kind of '-path' you just tried to give me")
+			fmt.Println(err)
+		}
+		if f.IsDir() {
+			cmd = exec.Command("staticcheck", "./...")
+			cmd.Dir = *cfg.cliOpts.path
+		} else {
+			cmd = exec.Command("staticcheck", *cfg.cliOpts.path)
+		}
 		output, err = cmd.CombinedOutput()
 		if err != nil {
-			fmt.Println(string(output))
-			fmt.Println(err)
-			logging.Error("Go linter failed!")
+			if !cfg.cliOpts.testing {
+				fmt.Println(string(output))
+				fmt.Println(err)
+				logging.Error("Go linter failed!")
+			}
 			failures["lint-go"] = "fail"
 		}
 	}
@@ -72,8 +95,10 @@ func lintGo(cfg rhadConfig) {
 func lintPython(cfg rhadConfig) {
 	files := getRelevantFiles(".*\\.py", cfg)
 	if len(files) > 0 {
-		logging.Info("Running Python format diff checker...")
-		cmd = exec.Command("black", "--diff", ".")
+		if !cfg.cliOpts.testing {
+			logging.Info("Running Python format diff checker...")
+		}
+		cmd = exec.Command("black", "--diff", *cfg.cliOpts.path)
 		output, err = cmd.CombinedOutput()
 		if err != nil {
 			fmt.Println(string(output))
@@ -82,30 +107,40 @@ func lintPython(cfg rhadConfig) {
 		if len(output) > 0 {
 			regex := regexp.MustCompile("would reformat")
 			if regex.MatchString(string(output)) {
-				fmt.Println(string(output))
-				logging.Error("Python format diff check failed!")
+				if !cfg.cliOpts.testing {
+					fmt.Println(string(output))
+					logging.Error("Python format diff check failed!")
+				}
 				failures["fmt-diff-check-python"] = "fail"
 			}
 		}
 
-		logging.Info("Running Python typechecker...")
-		cmd = exec.Command("mypy", ".")
+		if !cfg.cliOpts.testing {
+			logging.Info("Running Python typechecker...")
+		}
+		cmd = exec.Command("mypy", *cfg.cliOpts.path)
 		output, err = cmd.CombinedOutput()
 		if err != nil {
-			fmt.Println(string(output))
-			fmt.Println(err)
-			logging.Error("Python type checker failed!")
+			if !cfg.cliOpts.testing {
+				fmt.Println(string(output))
+				fmt.Println(err)
+				logging.Error("Python type checker failed!")
+			}
 			failures["typecheck-python"] = "fail"
 		}
 
-		logging.Info("Running Python linter...")
+		if !cfg.cliOpts.testing {
+			logging.Info("Running Python linter...")
+		}
 		for _, file := range files {
 			cmd = exec.Command("pylint", "--disable=import-error,invalid-name", file.path)
 			output, err = cmd.CombinedOutput()
 			if err != nil {
-				fmt.Println(string(output))
-				fmt.Println(err)
-				logging.Error("Python linter failed!")
+				if !cfg.cliOpts.testing {
+					fmt.Println(string(output))
+					fmt.Println(err)
+					logging.Error("Python linter failed!")
+				}
 				failures["lint-python"] = "fail"
 			}
 		}
@@ -115,14 +150,18 @@ func lintPython(cfg rhadConfig) {
 func lintMarkdown(cfg rhadConfig) {
 	files := getRelevantFiles(".*\\.(md|markdown)", cfg)
 	if len(files) > 0 {
-		logging.Info("Running Markdown linter...")
+		if !cfg.cliOpts.testing {
+			logging.Info("Running Markdown linter...")
+		}
 		for _, file := range files {
 			cmd = exec.Command("mdl", "--style", "../.mdlrc.style.rb", file.path)
 			output, err = cmd.CombinedOutput()
 			if err != nil {
-				fmt.Println(string(output))
-				fmt.Println(err)
-				logging.Error("Markdown linter failed!")
+				if !cfg.cliOpts.testing {
+					fmt.Println(string(output))
+					fmt.Println(err)
+					logging.Error("Markdown linter failed!")
+				}
 				failures["lint-markdown"] = "fail"
 			}
 		}
@@ -130,17 +169,23 @@ func lintMarkdown(cfg rhadConfig) {
 }
 
 func Lint(cfg rhadConfig) {
-	logging.Info("Running relevant linters...")
+	if !cfg.cliOpts.testing {
+		logging.Info("Running relevant linters...")
+	}
 	lintShell(cfg)
 	lintGo(cfg)
 	lintPython(cfg)
 	lintMarkdown(cfg)
 
 	if len(failures) > 0 {
-		logging.Error("One or more failures occurred during rhad's lint run! Summary:")
-		fmt.Println(failures)
+		if !cfg.cliOpts.testing {
+			logging.Error("One or more failures occurred during rhad's lint run! Summary:")
+			fmt.Println(failures)
+		}
 		os.Exit(1)
 	} else {
-		logging.Info("All linters passed!")
+		if !cfg.cliOpts.testing {
+			logging.Info("All linters passed!")
+		}
 	}
 }

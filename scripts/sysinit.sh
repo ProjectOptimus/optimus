@@ -58,6 +58,28 @@ init-ruby() {
   || errorf "Could not init Ruby packages for rhad!"
 }
 
+test-sysinit() {
+  cmds=(
+    curl
+    git
+    go
+    make
+    npm
+    python3
+    pip3
+    ruby
+    shellcheck
+  )
+  for cmd in "${cmds[@]}"; do
+    command -v "${cmd}" >/dev/null || {
+      errorf "Command '%s' not found" "${cmd}"
+      return 1
+    }
+  done
+
+  python3 -m venv -h > /dev/null
+}
+
 main() {
   if [[ $(id -u) -eq 0 ]]; then
     init-sys
@@ -67,6 +89,8 @@ main() {
     init-go
     init-python
   fi
+
+  test-sysinit
 }
 
 main || errorf "Failed to initialize rhad host!"
