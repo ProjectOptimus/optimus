@@ -6,7 +6,7 @@ ENV GOFLAGS -buildvcs=false
 COPY ./scripts/sysinit.sh ./scripts/sysinit.sh
 RUN bash ./scripts/sysinit.sh
 
-RUN adduser --gecos "" rhad
+RUN useradd --create-home rhad
 USER rhad
 WORKDIR /home/rhad
 
