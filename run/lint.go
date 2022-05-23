@@ -30,7 +30,7 @@ func lintShell(cfg rhadConfig) {
 			if err != nil {
 				// TODO: we don't want to exit here since a failure could be the
 				// shell return code -- but, it could be something worse, sure
-				logging.Error(string(output))
+				logging.Error("Output below:\n" + string(output))
 				logging.Error(err.Error())
 				logging.Error("Shell linter failed!")
 				failures["lint-shell"] = "fail"
@@ -48,11 +48,11 @@ func lintGo(cfg rhadConfig) {
 		cmd = exec.Command("gofmt", "-d", *cfg.cliOpts.path)
 		output, err = cmd.CombinedOutput()
 		if err != nil {
-			logging.Error(string(output))
+			logging.Error("Output below:\n" + string(output))
 			logging.Error(err.Error())
 		}
 		if len(output) > 0 {
-			logging.Error(string(output))
+			logging.Error("Output below:\n" + string(output))
 			logging.Error("Go format diff check failed!")
 			failures["fmt-diff-check-go"] = "fail"
 		} else {
@@ -74,7 +74,7 @@ func lintGo(cfg rhadConfig) {
 		}
 		output, err = cmd.CombinedOutput()
 		if err != nil {
-			logging.Error(string(output))
+			logging.Error("Output below:\n" + string(output))
 			logging.Error(err.Error())
 			logging.Error("Go linter failed!")
 			failures["lint-go"] = "fail"
@@ -91,13 +91,13 @@ func lintPython(cfg rhadConfig) {
 		cmd = exec.Command("black", "--diff", *cfg.cliOpts.path)
 		output, err = cmd.CombinedOutput()
 		if err != nil {
-			logging.Error(string(output))
+			logging.Error("Output below:\n" + string(output))
 			logging.Error(err.Error())
 		}
 		if len(output) > 0 {
 			regex := regexp.MustCompile("would reformat")
 			if regex.MatchString(string(output)) {
-				logging.Error(string(output))
+				logging.Error("Output below:\n" + string(output))
 				logging.Error("Python format diff check failed!")
 				failures["fmt-diff-check-python"] = "fail"
 			}
@@ -109,7 +109,7 @@ func lintPython(cfg rhadConfig) {
 		cmd = exec.Command("mypy", *cfg.cliOpts.path)
 		output, err = cmd.CombinedOutput()
 		if err != nil {
-			logging.Error(string(output))
+			logging.Error("Output below:\n" + string(output))
 			logging.Error(err.Error())
 			logging.Error("Python type checker failed!")
 			failures["typecheck-python"] = "fail"
@@ -122,7 +122,7 @@ func lintPython(cfg rhadConfig) {
 			cmd = exec.Command("pylint", "--disable=import-error,invalid-name", file.path)
 			output, err = cmd.CombinedOutput()
 			if err != nil {
-				logging.Error(string(output))
+				logging.Error("Output below:\n" + string(output))
 				logging.Error(err.Error())
 				logging.Error("Python linter failed!")
 				failures["lint-python"] = "fail"
@@ -140,7 +140,7 @@ func lintMarkdown(cfg rhadConfig) {
 		cmd = exec.Command("mdl", "--style", "../.mdlrc.style.rb", *cfg.cliOpts.path)
 		output, err = cmd.CombinedOutput()
 		if err != nil {
-			logging.Error(string(output))
+			logging.Error("Output below:\n" + string(output))
 			logging.Error(err.Error())
 			logging.Error("Markdown linter failed!")
 			failures["lint-markdown"] = "fail"
