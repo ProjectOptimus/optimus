@@ -137,17 +137,15 @@ func lintMarkdown(cfg rhadConfig) {
 	files := getRelevantFiles(".*\\.(md|markdown)", cfg)
 	if len(files) > 0 {
 		logging.Info("Running Markdown linter...")
-		for _, file := range files {
-			cmd = exec.Command("mdl", "--style", "../.mdlrc.style.rb", file.path)
-			output, err = cmd.CombinedOutput()
-			if err != nil {
-				logging.Error(string(output))
-				logging.Error(err.Error())
-				logging.Error("Markdown linter failed!")
-				failures["lint-markdown"] = "fail"
-			} else {
-				logging.Error("Markdown linter passed")
-			}
+		cmd = exec.Command("mdl", "--style", "../.mdlrc.style.rb", *cfg.cliOpts.path)
+		output, err = cmd.CombinedOutput()
+		if err != nil {
+			logging.Error(string(output))
+			logging.Error(err.Error())
+			logging.Error("Markdown linter failed!")
+			failures["lint-markdown"] = "fail"
+		} else {
+			logging.Error("Markdown linter passed")
 		}
 	}
 }
