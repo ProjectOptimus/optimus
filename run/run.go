@@ -71,11 +71,6 @@ func Run() {
 	case "deploy":
 		Deploy(cfg)
 	default:
-		logging.Warn("rhad run subcommand either not provided or invalid; running as 'all'")
-		Lint(cfg)
-		Test(cfg)
-		Build(cfg)
-		Push(cfg)
-		Deploy(cfg)
+		logging.Error("Invalid subcommand provided to rhad run")
 	}
 }
