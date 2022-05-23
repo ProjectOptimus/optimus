@@ -24,19 +24,22 @@ func lintShell(cfg rhadConfig) {
 	files := getRelevantFiles(".*\\.sh", cfg)
 	if len(files) > 0 {
 		logging.Info("Running shell linter...")
+		var iFiles []string
 		for _, file := range files {
-			cmd = exec.Command("shellcheck", file.path)
-			output, err = cmd.CombinedOutput()
-			if err != nil {
-				// TODO: we don't want to exit here since a failure could be the
-				// shell return code -- but, it could be something worse, sure
-				logging.Error("Output below:\n" + string(output))
-				logging.Error(err.Error())
-				logging.Error("Shell linter failed!")
-				failures["lint-shell"] = "fail"
-			} else {
-				logging.Info("Shell linter passed")
-			}
+			iFiles = append(iFiles, file.path)
+		}
+
+		cmd = exec.Command("shellcheck", iFiles...)
+		output, err = cmd.CombinedOutput()
+		if err != nil {
+			// TODO: we don't want to exit here since a failure could be the
+			// shell return code -- but, it could be something worse, sure
+			logging.Error("Output below:\n" + string(output))
+			logging.Error(err.Error())
+			logging.Error("Shell linter failed!")
+			failures["lint-shell"] = "fail"
+		} else {
+			logging.Info("Shell linter passed")
 		}
 	}
 }
@@ -118,17 +121,15 @@ func lintPython(cfg rhadConfig) {
 		}
 
 		logging.Info("Running Python linter...")
-		for _, file := range files {
-			cmd = exec.Command("pylint", "--disable=import-error,invalid-name", file.path)
-			output, err = cmd.CombinedOutput()
-			if err != nil {
-				logging.Error("Output below:\n" + string(output))
-				logging.Error(err.Error())
-				logging.Error("Python linter failed!")
-				failures["lint-python"] = "fail"
-			} else {
-				logging.Error("Python linter passed")
-			}
+		cmd = exec.Command("pylint", "--recursive=y", "--disable=import-error,invalid-name", *cfg.cliOpts.path)
+		output, err = cmd.CombinedOutput()
+		if err != nil {
+			logging.Error("Output below:\n" + string(output))
+			logging.Error(err.Error())
+			logging.Error("Python linter failed!")
+			failures["lint-python"] = "fail"
+		} else {
+			logging.Error("Python linter passed")
 		}
 	}
 }
