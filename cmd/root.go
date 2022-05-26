@@ -1,0 +1,58 @@
+// Package cmd implements the CLI logic for rhad
+package cmd
+
+import (
+	"os"
+
+	"github.com/opensourcecorp/rhad/logging"
+	"github.com/spf13/cobra"
+)
+
+var (
+	// rhadSrc is the root of the rhad source code itself -- useful for looking
+	// up paths relative to the binary, etc
+	rhadSrc string
+
+	// rhadFile (defined in fsutils.go) represents the Rhadfile configuration,
+	// which are collections of rhadConfigs
+	rf rhadFile
+	rc rhadConfig
+
+	rootCmd = &cobra.Command{
+		Use:   "rhad",
+		Short: "CI/CD task runner for OpenSourceCorp",
+	}
+)
+
+func init() {
+	var ok bool
+
+	rhadSrc, ok = os.LookupEnv("RHAD_SRC")
+	if !ok {
+		rhadSrc = "/home/rhad/rhad-src"
+	}
+}
+
+func Execute() {
+	var err error
+
+	rf = readRhadfile()
+	for path, cfg := range rf {
+		if path == "DEFAULT" {
+			continue
+		}
+		err = os.Chdir(path)
+		if err != nil {
+			logging.Error("Could not set working directory to '%s' for rhad on startup", path)
+			logging.Error(err.Error())
+			os.Exit(1)
+		}
+
+		rc = cfg
+
+		err = rootCmd.Execute()
+		if err != nil {
+			os.Exit(1)
+		}
+	}
+}

@@ -8,7 +8,13 @@ RUN bash ./scripts/sysinit.sh
 
 RUN useradd --create-home rhad
 USER rhad
-WORKDIR /home/rhad
+RUN mkdir -p \
+      /home/rhad/rhad-src \
+      /home/rhad/src \
+      /home/rhad/.local/bin
+WORKDIR /home/rhad/rhad-src
+
+ENV RHAD_SRC=/home/rhad/rhad-src
 
 # Set up PATH correctly for rhad user (I can't find a better way to do this)
 ENV PATH="/home/rhad/.local/bin:/home/rhad/go/bin:${PATH}"
@@ -18,15 +24,15 @@ COPY ./scripts/sysinit.sh ./scripts/sysinit.sh
 RUN bash ./scripts/sysinit.sh
 
 # Ok now hopefully we're all cached up
-COPY . .
+COPY --chown=rhad:rhad . .
 
+RUN go mod tidy
 RUN RHAD_TESTING=true make test clean
 
 RUN make build && \
     ln -fs build/linux-amd64/rhad ./rhad
 
-RUN mkdir -p /home/rhad/src /home/rhad/.local/bin
 WORKDIR /home/rhad/src
 
-ENTRYPOINT ["/home/rhad/rhad"]
-CMD ["run", "all"]
+ENTRYPOINT ["/home/rhad/rhad-src/rhad"]
+CMD ["all"]

@@ -1,0 +1,8 @@
+[  .  ]
+version = 0.1.0
+
+[./imgbuilder]
+version = 0.1.0
+
+[./datastore]
+version = 0.2.0
