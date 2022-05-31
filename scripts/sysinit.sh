@@ -30,7 +30,7 @@ init-bats() {
 }
 
 init-go() {
-  pkgs=(
+  local pkgs=(
     # golang.org/x/lint/golint
     honnef.co/go/tools/cmd/staticcheck
   )
@@ -59,7 +59,8 @@ init-ruby() {
 }
 
 test-sysinit() {
-  cmds=(
+  local failed=""
+  local cmds=(
     black
     curl
     git
@@ -76,10 +77,13 @@ test-sysinit() {
   )
   for cmd in "${cmds[@]}"; do
     command -v "${cmd}" >/dev/null || {
-      errorf "Command '%s' not found" "${cmd}"
-      return 1
+      printf 'ERROR: Command "%s" not found on PATH\n' "${cmd}"
+      failed=true
     }
   done
+  if [[ -n "${failed}" ]]; then
+    errorf '^ Above command(s) not found on PATH -- did you run the sysinit script for rhad?'
+  fi
 }
 
 main() {
@@ -96,6 +100,11 @@ main() {
   fi
 }
 
-main || errorf "Failed to initialize rhad host!"
+# Allow sourcing the file to run e.g. test-sysinit() by itself
+if [[ "${1:-}" == "test" ]]; then
+  test-sysinit
+elif [[ "${BASH_SOURCE[0]:-}" == "${0}" ]]; then
+  main || errorf "Failed to initialize rhad host!"
+fi
 
 exit 0
