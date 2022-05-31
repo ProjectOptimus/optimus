@@ -39,11 +39,12 @@ func Execute() {
 
 	rf = readRhadfile()
 	for path, cfg := range rf {
-		if path == "[DEFAULT]" {
-			continue
-		}
+		// Get rid of the brackets around INI section names
 		for _, e := range []string{"[", "]"} {
 			path = strings.ReplaceAll(path, e, "")
+		}
+		if path == "DEFAULT" { // INI's default, top-level section
+			continue
 		}
 		err = os.Chdir(path)
 		if err != nil {
