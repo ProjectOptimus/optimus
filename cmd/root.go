@@ -23,6 +23,9 @@ var (
 		Use:   "rhad",
 		Short: "CI/CD task runner for OpenSourceCorp",
 	}
+
+	// When running rhad's tests
+	isTesting bool
 )
 
 func init() {
@@ -31,6 +34,12 @@ func init() {
 	rhadSrc, ok = os.LookupEnv("RHAD_SRC")
 	if !ok {
 		rhadSrc = "/home/rhad/rhad-src"
+	}
+
+	if os.Getenv("RHAD_TESTING") == "true" {
+		isTesting = true
+	} else {
+		isTesting = false
 	}
 }
 

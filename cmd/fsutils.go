@@ -178,8 +178,22 @@ func getRelevantFiles(root, pattern string) []fileData {
 	allFiles := getAllFiles(root)
 	regex := regexp.MustCompile(pattern)
 	var files []fileData
+
+	// // We don't want rhad to lint its own testdata/ directory
+	// var isRhadItself bool
+	// cmd := exec.Command("git", "remote", "-v", "show")
+	// output, err := cmd.CombinedOutput()
+	// if err != nil {
+	// 	logging.Error("Trying to run git executable to check if you're in rhad's dir failed; is it not installed?")
+	// 	logging.Error(err.Error())
+	// 	os.Exit(1)
+	// }
+	// if strings.Contains(string(output), "rhad.git") {
+	// 	isRhadItself = true
+	// }
+
 	for _, file := range allFiles {
-		if regex.MatchString(file.Path) {
+		if regex.MatchString(file.Path) { // && (isRhadItself && !isTesting && !strings.Contains(file.Path, "testdata")) {
 			files = append(files, file)
 		}
 	}

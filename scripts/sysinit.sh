@@ -33,6 +33,7 @@ init-go() {
   local pkgs=(
     # golang.org/x/lint/golint
     honnef.co/go/tools/cmd/staticcheck
+    # github.com/terraform-linters/tflint # tflint sucks ass, no rules are enabled by default and the verbose-ass config file requires each desired rule to be set individually
   )
   for pkg in "${pkgs[@]}"; do
     go install \
@@ -49,6 +50,7 @@ init-python() {
     pylint \
     pytest \
     pytest-cov \
+    sqlfluff \
   || errorf "Could not init Python packages for rhad!"
 }
 

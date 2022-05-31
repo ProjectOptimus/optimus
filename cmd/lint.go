@@ -39,6 +39,8 @@ func lintExecute(cmd *cobra.Command, args []string) {
 	lintGo(args)
 	lintPython(args)
 	lintMarkdown(args)
+	lintSQL(args)
+	// lintTerraform(args)
 
 	if len(lintFailures) > 0 {
 		logging.Error("One or more failures occurred during rhad's lint run! Summary:")
@@ -52,7 +54,7 @@ func lintExecute(cmd *cobra.Command, args []string) {
 }
 
 func lintShell(args []string) {
-	files := getRelevantFiles(args[0], ".*\\.sh")
+	files := getRelevantFiles(args[0], `.*\.sh`)
 	if len(files) > 0 {
 		logging.Info("Running shell linter...")
 		// Shellcheck can take multiple individual file paths in a single run
@@ -76,7 +78,7 @@ func lintShell(args []string) {
 }
 
 func lintGo(args []string) {
-	files := getRelevantFiles(args[0], ".*\\.go")
+	files := getRelevantFiles(args[0], `.*\.go`)
 	if len(files) > 0 {
 		logging.Info("Running Go format diff check...")
 		s = syscallCfg{
@@ -123,7 +125,7 @@ func lintGo(args []string) {
 }
 
 func lintPython(args []string) {
-	files := getRelevantFiles(args[0], ".*\\.py")
+	files := getRelevantFiles(args[0], `.*\.py`)
 	if len(files) > 0 {
 		logging.Info("Running Python format diff checker...")
 		s = syscallCfg{
@@ -170,7 +172,7 @@ func lintPython(args []string) {
 }
 
 func lintMarkdown(args []string) {
-	files := getRelevantFiles(args[0], ".*\\.(md|markdown)")
+	files := getRelevantFiles(args[0], `.*\.(md|markdown)`)
 	if len(files) > 0 {
 		logging.Info("Running Markdown linter...")
 		s = syscallCfg{
@@ -187,3 +189,42 @@ func lintMarkdown(args []string) {
 		}
 	}
 }
+
+func lintSQL(args []string) {
+	files := getRelevantFiles(args[0], `.*\.sql`)
+	if len(files) > 0 {
+		logging.Info("Running SQL linter...")
+		s = syscallCfg{
+			[]string{"sqlfluff", "lint", "--dialect", "postgresql", args[0]},
+			"nonZeroExit",
+			"",
+		}
+		syscallOk = syscall(s)
+		if !syscallOk {
+			logging.Error("SQL linter failed!")
+			lintFailures["lint-sql"] = "fail"
+		} else {
+			logging.Error("SQL linter passed")
+		}
+	}
+}
+
+// TODO: Find a Terraform linter that doesn't suck
+// func lintTerraform(args []string) {
+// 	files := getRelevantFiles(`.*\.tf(vars)?`)
+// 	if len(files) > 0 {
+// 		logging.Info("Running Terraform linter...")
+// 		s = syscallCfg{
+// 			[]string{},
+// 			"nonZeroExit",
+// 			"",
+// 		}
+// 		syscallOk = syscall(s)
+// 		if !syscallOk {
+// 			logging.Error("Terraform linter failed!")
+// 			lintFailures["lint-terraform"] = "fail"
+// 		} else {
+// 			logging.Error("Terraform linter passed")
+// 		}
+// 	}
+// }

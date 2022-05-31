@@ -110,3 +110,7 @@ func TestLintMarkdown(t *testing.T) {
 
 	delete(lintFailures, "lint-markdown")
 }
+
+func TestLintSQL(t *testing.T) {
+	t.Errorf("Need to implement SQL lint test")
+}
