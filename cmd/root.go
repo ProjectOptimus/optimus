@@ -3,6 +3,7 @@ package cmd
 
 import (
 	"os"
+	"strings"
 
 	"github.com/opensourcecorp/rhad/logging"
 	"github.com/spf13/cobra"
@@ -38,8 +39,11 @@ func Execute() {
 
 	rf = readRhadfile()
 	for path, cfg := range rf {
-		if path == "DEFAULT" {
+		if path == "[DEFAULT]" {
 			continue
+		}
+		for _, e := range []string{"[", "]"} {
+			path = strings.ReplaceAll(path, e, "")
 		}
 		err = os.Chdir(path)
 		if err != nil {
