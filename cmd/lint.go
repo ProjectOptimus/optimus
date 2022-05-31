@@ -58,7 +58,7 @@ func lintShell(args []string) {
 		// Shellcheck can take multiple individual file paths in a single run
 		var iFiles []string
 		for _, file := range files {
-			iFiles = append(iFiles, file.path)
+			iFiles = append(iFiles, file.Path)
 		}
 		s = syscallCfg{
 			append([]string{"shellcheck"}, iFiles...),

@@ -3,7 +3,9 @@ module github.com/opensourcecorp/rhad
 go 1.18
 
 require (
+	github.com/google/go-cmp v0.5.8
 	github.com/spf13/cobra v1.4.0
+	golang.org/x/mod v0.5.1
 	gopkg.in/ini.v1 v1.66.4
 )
 
