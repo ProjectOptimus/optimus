@@ -21,7 +21,6 @@ type fileData struct {
 // rhadConfig represents each section's contents of a Rhadfile
 type rhadConfig struct {
 	Version string `ini:"version"`
-	Farts   string `ini:"farts"`
 }
 
 // rhadFile represents all sections (rhadConfigs) together in a Rhadfile, with
