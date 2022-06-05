@@ -18,6 +18,7 @@ var (
 		Short: "Run rhad's heuristic linter aggregator",
 		Run:   lintExecute,
 	}
+	ignorePattern string
 
 	// Used to track failures, and then throw them all as errors at the end if its size is non-zero
 	lintFailures = make(failureMap)
@@ -25,6 +26,12 @@ var (
 
 func init() {
 	rootCmd.AddCommand(lintCmd)
+	// TODO: this works, but isn't being implemented because of how the linters
+	// operate -- they target directories, not individual files, and so even
+	// though the files are ignored, the linter calls hit the whole tree. So,
+	// find a way to get the linters to do better. Maybe copy the tree to /tmp
+	// excluding the ignored files?
+	lintCmd.PersistentFlags().StringVarP(&ignorePattern, "ignore-pattern", "i", `^\b$`, "(NOTE: NOT CURRENTLY WORKING) Valid regex pattern of paths to ignore") // default can never be matched in a regex
 }
 
 func lintExecute(cmd *cobra.Command, args []string) {
