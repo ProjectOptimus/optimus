@@ -31,14 +31,20 @@ init-bats() {
 
 init-go() {
   local pkgs=(
-    # golang.org/x/lint/golint
     honnef.co/go/tools/cmd/staticcheck
-    # github.com/terraform-linters/tflint # tflint sucks ass, no rules are enabled by default and the verbose-ass config file requires each desired rule to be set individually
   )
   for pkg in "${pkgs[@]}"; do
     go install \
       "${pkg}"@latest
   done
+
+  # # They don't want you to install this via `go install`, so
+  # curl -fsSL -o golangci-lint.tar.gz 'https://github.com/golangci/golangci-lint/releases/download/v1.46.2/golangci-lint-1.46.2-linux-amd64.tar.gz'
+  # tar -xzf golangci-lint.tar.gz
+  # rm golangci-lint.tar.gz
+  # mv golangci-lint*/golangci-lint "$(go env GOPATH)"/bin/golangci-lint
+  # rm -rf golangci-lint
+
   mkdir -p "${HOME}"/.local/bin/
   ln -fs "$(go env GOPATH)"/bin/* "${HOME}"/.local/bin/
 }
