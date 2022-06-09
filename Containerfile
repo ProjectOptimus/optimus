@@ -3,6 +3,8 @@ FROM debian:unstable
 # Go's staticcheck linter complains unless this is set
 ENV GOFLAGS -buildvcs=false
 
+WORKDIR /root
+
 COPY ./scripts/sysinit.sh ./scripts/sysinit.sh
 RUN bash ./scripts/sysinit.sh
 
