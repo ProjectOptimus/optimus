@@ -2,6 +2,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -17,7 +18,7 @@ var (
 	// rhadFile (defined in fsutils.go) represents the Rhadfile configuration,
 	// which are collections of rhadConfigs
 	rf rhadFile
-	rc rhadConfig
+	// rc rhadConfig
 
 	rootCmd = &cobra.Command{
 		Use:   "rhad",
@@ -38,8 +39,7 @@ func init() {
 
 	if os.Getenv("RHAD_TESTING") == "true" {
 		isTesting = true
-	} else {
-		isTesting = false
+		fmt.Printf("RHAD_TESTING set to '%v', so will surpress further output\n", isTesting)
 	}
 }
 
@@ -47,7 +47,7 @@ func Execute() {
 	var err error
 
 	rf = readRhadfile()
-	for path, cfg := range rf {
+	for path := range rf { // cfg := range rf {
 		// Get rid of the brackets around INI section names
 		for _, e := range []string{"[", "]"} {
 			path = strings.ReplaceAll(path, e, "")
@@ -62,7 +62,7 @@ func Execute() {
 			os.Exit(1)
 		}
 
-		rc = cfg
+		// rc = cfg
 
 		err = rootCmd.Execute()
 		if err != nil {

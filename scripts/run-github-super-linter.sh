@@ -7,6 +7,8 @@ set -euo pipefail
 # Clean up after any last runs, because it'll creep on its own files
 rm -rf ./super-linter.log ./*cache*
 
+result=0
+
 # Lots of arg setting, like e.g. disabling Go linting because super-linter's Go
 # lint runs don't respect packages/multiple files
 docker run \
@@ -20,4 +22,12 @@ docker run \
   -e VALIDATE_GO=false \
   -e VALIDATE_NATURAL_LANGUAGE=false \
   -v "${PWD}":/tmp/lint \
-  docker.io/github/super-linter:slim-v4
+  docker.io/github/super-linter:slim-v4 \
+|| result="$?"
+
+# Don't want log hanging around locally if everything was fine
+if [[ "${result}" -eq 0 ]]; then
+  rm super-linter.log
+fi
+
+exit "${result}"

@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# This script prepares the rhad host. There is currently a lot of no-longer-used
+# code in here, as we move to try out the GitHub Super-Linter instead of
+# managing our own linter list
+
 export DEBIAN_FRONTEND=noninteractive
 
 errorf() {
@@ -10,17 +14,22 @@ errorf() {
 
 init-sys() {
   apt-get update
+  # apt-get install -y 
+  #   curl 
+  #   git 
+  #   golang 
+  #   make 
+  #   npm
+  #   python3 
+  #   python3-pip 
+  #   python3-venv 
+  #   ruby-full 
+  #X  shellcheck
   apt-get install -y \
     curl \
     git \
     golang \
     make \
-    npm \
-    python3 \
-    python3-pip \
-    python3-venv \
-    ruby-full \
-    shellcheck \
   || errorf "Could not init system packages for rhad!"
 }
 
@@ -31,19 +40,20 @@ init-bats() {
 
 init-go() {
   local pkgs=(
-    honnef.co/go/tools/cmd/staticcheck
+    # honnef.co/go/tools/cmd/staticcheck
   )
   for pkg in "${pkgs[@]}"; do
     go install \
       "${pkg}"@latest
   done
 
-  # # They don't want you to install this via `go install`, so
-  # curl -fsSL -o golangci-lint.tar.gz 'https://github.com/golangci/golangci-lint/releases/download/v1.46.2/golangci-lint-1.46.2-linux-amd64.tar.gz'
-  # tar -xzf golangci-lint.tar.gz
-  # rm golangci-lint.tar.gz
-  # mv golangci-lint*/golangci-lint "$(go env GOPATH)"/bin/golangci-lint
-  # rm -rf golangci-lint
+  # They don't want you to install this via `go install`, so
+  curl -fsSL -o golangci-lint.tar.gz 'https://github.com/golangci/golangci-lint/releases/download/v1.46.2/golangci-lint-1.46.2-linux-amd64.tar.gz'
+  tar -xzf golangci-lint.tar.gz
+  rm golangci-lint.tar.gz
+  mkdir -p "$(go env GOPATH)"/bin
+  mv golangci-lint*/golangci-lint "$(go env GOPATH)"/bin/golangci-lint
+  rm -rf golangci-lint*
 
   mkdir -p "${HOME}"/.local/bin/
   ln -fs "$(go env GOPATH)"/bin/* "${HOME}"/.local/bin/
@@ -69,19 +79,20 @@ init-ruby() {
 test-sysinit() {
   local failed=""
   local cmds=(
-    black
+    # black
     curl
     git
     go
+    golangci-lint
     make
-    mdl
-    mypy
-    npm
-    python3
-    pip3
-    ruby
-    shellcheck
-    staticcheck
+    # mdl
+    # mypy
+    # npm
+    # python3
+    # pip3
+    # ruby
+    # shellcheck
+    # staticcheck
   )
   for cmd in "${cmds[@]}"; do
     command -v "${cmd}" >/dev/null || {
@@ -97,11 +108,11 @@ test-sysinit() {
 main() {
   if [[ $(id -u) -eq 0 ]]; then
     init-sys
-    init-bats
-    init-ruby
+    # init-bats
+    # init-ruby
   else  
     init-go
-    init-python
+    # init-python
     
     # Also run tests as nonroot, so setup is confirmed for the least-privileged user
     test-sysinit
