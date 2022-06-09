@@ -41,7 +41,7 @@ func lintExecute(cmd *cobra.Command, args []string) {
 		args = []string{"."}
 	}
 
-	logging.Info("Running relevant linters...")
+	logging.Info("Running relevant linters that the GitHub Super-Linter didn't already run...")
 	lintShell(args)
 	lintGo(args)
 	lintPython(args)
@@ -202,7 +202,7 @@ func lintSQL(args []string) {
 	if len(files) > 0 {
 		logging.Info("Running SQL linter...")
 		s = syscallCfg{
-			[]string{"sqlfluff", "lint", "--dialect", "postgresql", args[0]},
+			[]string{"sqlfluff", "lint", "--dialect", "postgres", args[0]},
 			"nonZeroExit",
 			"",
 		}

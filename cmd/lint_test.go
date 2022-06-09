@@ -17,6 +17,7 @@ var (
 		"go":       {"go_good.go", "go_bad.go"},
 		"python":   {"python_good.py", "python-bad.py"},
 		"markdown": {"markdown-good.md", "markdown-bad.md"},
+		"sql":      {"sql_good.sql", "sql_bad.sql"},
 	}
 )
 
@@ -112,5 +113,15 @@ func TestLintMarkdown(t *testing.T) {
 }
 
 func TestLintSQL(t *testing.T) {
-	t.Errorf("Need to implement SQL lint test")
+	lintSQL([]string{testLintRoot + "/" + goodBadFiles["sql"][0]})
+	if _, oops := lintFailures["lint-sql"]; oops {
+		t.Errorf(makeTestMessage("sql", "lint-sql", "wantPass"), lintFailures)
+	}
+
+	lintSQL([]string{testLintRoot + "/" + goodBadFiles["sql"][1]})
+	if lintFailures["lint-sql"] != "fail" {
+		t.Errorf(makeTestMessage("sql", "lint-sql", "wantFail"), lintFailures)
+	}
+
+	delete(lintFailures, "lint-sql")
 }
