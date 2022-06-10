@@ -98,7 +98,7 @@ func lintGo(args []string) {
 			logging.Error("Go format diff check failed!")
 			lintFailures["fmt-diff-check-go"] = "fail"
 		} else {
-			logging.Error("Go format diff check passed")
+			logging.Info("Go format diff check passed")
 		}
 
 		logging.Info("Running Go linter...")
@@ -113,7 +113,7 @@ func lintGo(args []string) {
 			logging.Error("Go linter failed!")
 			lintFailures["lint-go"] = "fail"
 		} else {
-			logging.Error("Go linter passed")
+			logging.Info("Go linter passed")
 		}
 	}
 }
@@ -132,7 +132,7 @@ func lintGo(args []string) {
 // 			logging.Error("Python format diff check failed!")
 // 			lintFailures["fmt-diff-check-python"] = "fail"
 // 		} else {
-// 			logging.Error("Python format diff checker passed")
+// 			logging.Info("Python format diff checker passed")
 // 		}
 
 // 		logging.Info("Running Python typecheck...")
@@ -146,7 +146,7 @@ func lintGo(args []string) {
 // 			logging.Error("Python type checker failed!")
 // 			lintFailures["typecheck-python"] = "fail"
 // 		} else {
-// 			logging.Error("Python typecheck passed")
+// 			logging.Info("Python typecheck passed")
 // 		}
 
 // 		logging.Info("Running Python linter...")
@@ -160,7 +160,7 @@ func lintGo(args []string) {
 // 			logging.Error("Python linter failed!")
 // 			lintFailures["lint-python"] = "fail"
 // 		} else {
-// 			logging.Error("Python linter passed")
+// 			logging.Info("Python linter passed")
 // 		}
 // 	}
 // }
@@ -179,7 +179,7 @@ func lintGo(args []string) {
 // 			logging.Error("Markdown linter failed!")
 // 			lintFailures["lint-markdown"] = "fail"
 // 		} else {
-// 			logging.Error("Markdown linter passed")
+// 			logging.Info("Markdown linter passed")
 // 		}
 // 	}
 // }
@@ -198,7 +198,7 @@ func lintGo(args []string) {
 // 			logging.Error("SQL linter failed!")
 // 			lintFailures["lint-sql"] = "fail"
 // 		} else {
-// 			logging.Error("SQL linter passed")
+// 			logging.Info("SQL linter passed")
 // 		}
 // 	}
 // }
@@ -218,7 +218,7 @@ func lintGo(args []string) {
 // 			logging.Error("Terraform linter failed!")
 // 			lintFailures["lint-terraform"] = "fail"
 // 		} else {
-// 			logging.Error("Terraform linter passed")
+// 			logging.Info("Terraform linter passed")
 // 		}
 // 	}
 // }
