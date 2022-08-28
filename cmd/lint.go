@@ -34,6 +34,9 @@ func init() {
 func lintExecute(cmd *cobra.Command, args []string) {
 	testSysinit()
 
+	// If no args provided, we'll make an assumption that most callables will
+	// take the current directory as an arg. We can control this override within
+	// each linter function call, though
 	if len(args) == 0 {
 		args = []string{"."}
 	}
@@ -60,9 +63,46 @@ func lintExecute(cmd *cobra.Command, args []string) {
 func lintGo(args []string) {
 	files := getRelevantFiles(args[0], `.*\.go`)
 	if len(files) > 0 {
+		// If more than a single file, might as well just use go's package tree
+		// syntax to look for packages if the tool supports it
+		var packageTree string
+		if len(files) > 1 {
+			packageTree = "./..."
+		} else {
+			// But linter unit test runs usually are just given a single file, so fall back
+			packageTree = args[0]
+		}
+
+		// Vetter
+		osc.InfoLog("Running Go vetter...")
+		sc = osc.Syscall{
+			CmdLine: []string{"go", "vet", packageTree},
+		}
+		sc.Exec()
+		if !sc.Ok {
+			writeTrackerRecord(TrackerRecord{
+				Type:     "lint",
+				Subtype:  "vet",
+				Language: "go",
+				Tool:     "go vet",
+				Result:   "fail",
+			})
+			osc.ErrorLog(nil, "Go vetter failed!")
+		} else {
+			writeTrackerRecord(TrackerRecord{
+				Type:     "lint",
+				Subtype:  "vet",
+				Language: "go",
+				Tool:     "go vet",
+				Result:   "pass",
+			})
+			osc.InfoLog("Go vetter passed")
+		}
+
+		// Format diff checker
 		osc.InfoLog("Running Go format diff check...")
 		sc = osc.Syscall{
-			CmdLine:      []string{"gofmt", "-d", args[0]},
+			CmdLine:      []string{"gofmt", "-d", args[0]}, // gofmt doesn't support the package tree syntax
 			ErrCheckType: "outputGTZero",
 		}
 		sc.Exec()
@@ -80,15 +120,16 @@ func lintGo(args []string) {
 				Type:     "lint",
 				Subtype:  "fmt-diff-check",
 				Language: "go",
-				Tool:     "go fmt",
+				Tool:     "gofmt",
 				Result:   "pass",
 			})
 			osc.InfoLog("Go format diff check passed")
 		}
 
+		// Linter
 		osc.InfoLog("Running Go linter...")
 		sc = osc.Syscall{
-			CmdLine: []string{"golangci-lint", "run", args[0]},
+			CmdLine: []string{"golangci-lint", "run", packageTree},
 		}
 		sc.Exec()
 		if !sc.Ok {
