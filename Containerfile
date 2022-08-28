@@ -29,7 +29,7 @@ RUN bash ./scripts/sysinit.sh
 COPY --chown=rhad:rhad . .
 
 RUN go mod tidy
-RUN RHAD_TESTING=true make test clean
+RUN make test clean
 
 RUN make build && \
     ln -fs build/linux-amd64/rhad ./rhad

@@ -2,11 +2,12 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/opensourcecorp/rhad/logging"
+	osc "github.com/opensourcecorp/go-common"
 	"github.com/spf13/cobra"
 )
 
@@ -47,7 +48,7 @@ func Execute() {
 	var err error
 
 	rf = readRhadfile()
-	for path := range rf { // cfg := range rf {
+	for path := range rf {
 		// Get rid of the brackets around INI section names
 		for _, e := range []string{"[", "]"} {
 			path = strings.ReplaceAll(path, e, "")
@@ -57,9 +58,7 @@ func Execute() {
 		}
 		err = os.Chdir(path)
 		if err != nil {
-			logging.Error("Could not set working directory to '%s' for rhad on startup", path)
-			logging.Error(err.Error())
-			os.Exit(1)
+			osc.FatalLog(err, "Could not set working directory to '%s' for rhad on startup", path)
 		}
 
 		// rc = cfg
@@ -68,5 +67,21 @@ func Execute() {
 		if err != nil {
 			os.Exit(1)
 		}
+	}
+}
+
+// testSysinit can be used to run before functions that are making
+// osc.Syscall.Exec()s, so they hopefully catch runtime errors earlier
+func testSysinit() {
+	if _, err := os.Stat(rhadSrc); errors.Is(err, os.ErrNotExist) {
+		rhadSrc = "."
+	}
+
+	sc := osc.Syscall{
+		CmdLine: []string{"bash", rhadSrc + "/scripts/sysinit.sh", "test"},
+	}
+	sc.Exec()
+	if !sc.Ok {
+		os.Exit(1)
 	}
 }

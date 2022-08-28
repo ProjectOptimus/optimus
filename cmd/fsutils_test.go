@@ -7,39 +7,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestGetVersion(t *testing.T) {
-	var want, got, s string // 's' is the version string from Rhadfile
-
-	s = "1.0.0.0"
-	want = "v1.0.0"
-	got = getVersion(s)
-	if want != got {
-		t.Errorf("Expected version string '%s' to become '%s', but got '%s'\n", s, want, got)
-	}
-
-	s = "1.0-alpha"
-	want = "v1.0.0-alpha"
-	got = getVersion(s)
-	if want != got {
-		t.Errorf("Expected version string '%s' to become '%s', but got '%s'\n", s, want, got)
-	}
-
-	s = "1.0.2+abc"
-	want = "v1.0.2+abc"
-	got = getVersion(s)
-	if want != got {
-		t.Errorf("Expected version string '%s' to become '%s', but got '%s'\n", s, want, got)
-	}
-
-	// No change on ideally-provided semver format
-	s = "v1.1.9-prebeta1+abc"
-	want = s
-	got = getVersion(s)
-	if want != got {
-		t.Errorf("Expected version string '%s' to become '%s', but got '%s'\n", s, want, got)
-	}
-}
-
 func TestGetAllFiles(t *testing.T) {
 	var want, got []fileData
 
@@ -76,27 +43,5 @@ func TestGetRelevantFiles(t *testing.T) {
 	got = getRelevantFiles(testingRoot, `(\.go|\.json)`)
 	if !cmp.Equal(want, got) {
 		t.Errorf("\nWant: %v\nGot:  %v\n", want, got)
-	}
-}
-
-func TestCleanSectionName(t *testing.T) {
-	var want, got string
-
-	want = "[.]"
-	got = cleanSectionName("[.]")
-	if want != got {
-		t.Errorf("Want: %v, Got: %v\n", want, got)
-	}
-
-	want = "[.]"
-	got = cleanSectionName("[  .  ]")
-	if want != got {
-		t.Errorf("Want: %v, Got: %v\n", want, got)
-	}
-
-	want = "[dir1]"
-	got = cleanSectionName("[  ./dir1    ]")
-	if want != got {
-		t.Errorf("Want: %v, Got: %v\n", want, got)
 	}
 }

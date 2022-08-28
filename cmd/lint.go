@@ -1,17 +1,17 @@
+// Package cmd's lint submodule provides linting functionality that is either
+// easier to configure or has unavailable behavior in external linter
+// aggregators
 package cmd
 
 import (
 	"os"
 
-	"github.com/opensourcecorp/rhad/logging"
+	osc "github.com/opensourcecorp/go-common"
 	"github.com/spf13/cobra"
 )
 
-type failureMap map[string]string
-
 var (
-	s         syscallCfg
-	syscallOk bool
+	sc osc.Syscall
 
 	lintCmd = &cobra.Command{
 		Use:   "lint",
@@ -19,9 +19,6 @@ var (
 		Run:   lintExecute,
 	}
 	ignorePattern string
-
-	// Used to track failures, and then throw them all as errors at the end if its size is non-zero
-	lintFailures = make(failureMap)
 )
 
 func init() {
@@ -41,184 +38,69 @@ func lintExecute(cmd *cobra.Command, args []string) {
 		args = []string{"."}
 	}
 
-	logging.Info("Running relevant linters that the GitHub Super-Linter didn't already run...")
-	// lintShell(args)
+	osc.InfoLog("Running relevant linters that the GitHub Super-Linter didn't already run...")
 	lintGo(args)
-	// lintPython(args)
-	// lintMarkdown(args)
-	// lintSQL(args)
-	// lintTerraform(args)
 
-	if len(lintFailures) > 0 {
-		logging.Error("One or more failures occurred during rhad's lint run! Summary:")
-		for k, v := range lintFailures {
-			logging.Error("%v: %v", k, v)
+	trackerData := getTrackerData()
+	failures := checkTrackerFailures(trackerData, "lint")
+
+	if failures > 0 {
+		osc.ErrorLog(nil, "One or more failures occurred during rhad's lint run! Summary:")
+		for _, record := range trackerData {
+			if record.Result == "fail" {
+				osc.ErrorLog(nil, "%v", record)
+			}
 		}
 		os.Exit(1)
 	} else {
-		logging.Info("All linters passed!")
+		osc.InfoLog("All linters passed!")
 	}
 }
-
-// func lintShell(args []string) {
-// 	files := getRelevantFiles(args[0], `.*\.sh`)
-// 	if len(files) > 0 {
-// 		logging.Info("Running shell linter...")
-// 		// Shellcheck can take multiple individual file paths in a single run
-// 		var iFiles []string
-// 		for _, file := range files {
-// 			iFiles = append(iFiles, file.Path)
-// 		}
-// 		s = syscallCfg{
-// 			append([]string{"shellcheck"}, iFiles...),
-// 			"nonZeroExit",
-// 			"",
-// 		}
-// 		syscallOk = syscall(s)
-// 		if !syscallOk {
-// 			logging.Error("Shell linter failed!")
-// 			lintFailures["lint-shell"] = "fail"
-// 		} else {
-// 			logging.Info("Shell linter passed")
-// 		}
-// 	}
-// }
 
 func lintGo(args []string) {
 	files := getRelevantFiles(args[0], `.*\.go`)
 	if len(files) > 0 {
-		logging.Info("Running Go format diff check...")
-		s = syscallCfg{
-			[]string{"gofmt", "-d", args[0]},
-			"outputGTZero",
-			"",
+		osc.InfoLog("Running Go format diff check...")
+		sc = osc.Syscall{
+			CmdLine:      []string{"gofmt", "-d", args[0]},
+			ErrCheckType: "outputGTZero",
 		}
-		syscallOk = syscall(s)
-		if !syscallOk {
-			logging.Error("Go format diff check failed!")
-			lintFailures["fmt-diff-check-go"] = "fail"
+		sc.Exec()
+		if !sc.Ok {
+			writeTrackerRecord(TrackerRecord{
+				Type:     "lint",
+				Subtype:  "go-fmt-diff-check",
+				Language: "go",
+				Result:   "fail",
+			})
+			osc.ErrorLog(nil, "Go format diff check failed!")
 		} else {
-			logging.Info("Go format diff check passed")
+			writeTrackerRecord(TrackerRecord{
+				Type:     "lint",
+				Subtype:  "fmt-diff-check",
+				Tool:     "go fmt",
+				Language: "go",
+				Result:   "pass",
+			})
+			osc.InfoLog("Go format diff check passed")
 		}
 
-		logging.Info("Running Go linter...")
-		s = syscallCfg{
+		osc.InfoLog("Running Go linter...")
+		sc = osc.Syscall{
 			// []string{"staticcheck", staticcheckArg},
-			[]string{"golangci-lint", "run", args[0]},
-			"nonZeroExit",
-			"",
+			CmdLine: []string{"golangci-lint", "run", args[0]},
 		}
-		syscallOk = syscall(s)
-		if !syscallOk {
-			logging.Error("Go linter failed!")
-			lintFailures["lint-go"] = "fail"
+		sc.Exec()
+		if !sc.Ok {
+			writeTrackerRecord(TrackerRecord{
+				Type:     "lint",
+				Tool:     "golangci-lint",
+				Language: "go",
+				Result:   "pass",
+			})
+			osc.ErrorLog(nil, "Go linter failed!")
 		} else {
-			logging.Info("Go linter passed")
+			osc.InfoLog("Go linter passed")
 		}
 	}
 }
-
-// func lintPython(args []string) {
-// 	files := getRelevantFiles(args[0], `.*\.py`)
-// 	if len(files) > 0 {
-// 		logging.Info("Running Python format diff checker...")
-// 		s = syscallCfg{
-// 			[]string{"black", "--diff", args[0]},
-// 			"outputGTZero",
-// 			"would reformat",
-// 		}
-// 		syscallOk = syscall(s)
-// 		if !syscallOk {
-// 			logging.Error("Python format diff check failed!")
-// 			lintFailures["fmt-diff-check-python"] = "fail"
-// 		} else {
-// 			logging.Info("Python format diff checker passed")
-// 		}
-
-// 		logging.Info("Running Python typecheck...")
-// 		s = syscallCfg{
-// 			[]string{"mypy", "--no-incremental", args[0]},
-// 			"nonZeroExit",
-// 			"would reformat",
-// 		}
-// 		syscallOk = syscall(s)
-// 		if !syscallOk {
-// 			logging.Error("Python type checker failed!")
-// 			lintFailures["typecheck-python"] = "fail"
-// 		} else {
-// 			logging.Info("Python typecheck passed")
-// 		}
-
-// 		logging.Info("Running Python linter...")
-// 		s = syscallCfg{
-// 			[]string{"pylint", "--recursive=y", "--disable=import-error,invalid-name", args[0]},
-// 			"nonZeroExit",
-// 			"",
-// 		}
-// 		syscallOk = syscall(s)
-// 		if !syscallOk {
-// 			logging.Error("Python linter failed!")
-// 			lintFailures["lint-python"] = "fail"
-// 		} else {
-// 			logging.Info("Python linter passed")
-// 		}
-// 	}
-// }
-
-// func lintMarkdown(args []string) {
-// 	files := getRelevantFiles(args[0], `.*\.(md|markdown)`)
-// 	if len(files) > 0 {
-// 		logging.Info("Running Markdown linter...")
-// 		s = syscallCfg{
-// 			[]string{"mdl", "--style", rhadSrc + "/.mdlrc.style.rb", args[0]},
-// 			"nonZeroExit",
-// 			"",
-// 		}
-// 		syscallOk = syscall(s)
-// 		if !syscallOk {
-// 			logging.Error("Markdown linter failed!")
-// 			lintFailures["lint-markdown"] = "fail"
-// 		} else {
-// 			logging.Info("Markdown linter passed")
-// 		}
-// 	}
-// }
-
-// func lintSQL(args []string) {
-// 	files := getRelevantFiles(args[0], `.*\.sql`)
-// 	if len(files) > 0 {
-// 		logging.Info("Running SQL linter...")
-// 		s = syscallCfg{
-// 			[]string{"sqlfluff", "lint", "--dialect", "postgres", args[0]},
-// 			"nonZeroExit",
-// 			"",
-// 		}
-// 		syscallOk = syscall(s)
-// 		if !syscallOk {
-// 			logging.Error("SQL linter failed!")
-// 			lintFailures["lint-sql"] = "fail"
-// 		} else {
-// 			logging.Info("SQL linter passed")
-// 		}
-// 	}
-// }
-
-// TODO: Find a Terraform linter that doesn't suck
-// func lintTerraform(args []string) {
-// 	files := getRelevantFiles(`.*\.tf(vars)?`)
-// 	if len(files) > 0 {
-// 		logging.Info("Running Terraform linter...")
-// 		s = syscallCfg{
-// 			[]string{},
-// 			"nonZeroExit",
-// 			"",
-// 		}
-// 		syscallOk = syscall(s)
-// 		if !syscallOk {
-// 			logging.Error("Terraform linter failed!")
-// 			lintFailures["lint-terraform"] = "fail"
-// 		} else {
-// 			logging.Info("Terraform linter passed")
-// 		}
-// 	}
-// }

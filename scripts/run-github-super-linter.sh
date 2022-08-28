@@ -19,6 +19,7 @@ docker run \
   -e USE_FIND_ALGORITHM=true \
   -e IGNORE_GITIGNORED_FILES=true \
   -e FILTER_REGEX_EXCLUDE='testdata.*' \
+  -e FILTER_REGEX_EXCLUDE='.*\.vmdk|.*\.ovf|.*\.box|.*\.iso' \
   -e VALIDATE_GO=false \
   -e VALIDATE_NATURAL_LANGUAGE=false \
   -v "${PWD}":/tmp/lint \

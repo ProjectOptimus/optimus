@@ -4,36 +4,23 @@ package cmd
 // defined in lint.go
 
 import (
-	"fmt"
-	"log"
 	"testing"
 )
 
 var (
 	testLintRoot = "../testdata/linters"
 
+	testTrackerData  []TrackerRecord
+	testLintFailures int
+
 	goodBadFiles = map[string][]string{
-		"shell":    {"shell-good.sh", "shell-bad.sh"},
-		"go":       {"go_good.go", "go_bad.go"},
-		"python":   {"python_good.py", "python-bad.py"},
-		"markdown": {"markdown-good.md", "markdown-bad.md"},
-		"sql":      {"sql_good.sql", "sql_bad.sql"},
+		// "shell":    {"shell-good.sh", "shell-bad.sh"},
+		"go": {"go_good.go", "go_bad.go"},
+		// "python":   {"python_good.py", "python-bad.py"},
+		// "markdown": {"markdown-good.md", "markdown-bad.md"},
+		// "sql":      {"sql_good.sql", "sql_bad.sql"},
 	}
 )
-
-func makeTestMessage(lintType, mapKeyName, wantResult string) string {
-	var msg string
-	switch wantResult {
-	case "wantPass":
-		msg = fmt.Sprintf("failureMap 'lintFailures' does not reflect a(n) %s linting success as expected - map key '%s' should not exist but might: %%v", lintType, mapKeyName)
-	case "wantFail":
-		msg = fmt.Sprintf("failureMap 'lintFailures' does not reflect a(n) %s linting failure as expected - map key should '%s' have value 'fail': %%v", lintType, mapKeyName)
-	default:
-		log.Fatalln("hey you're not supposed to get here")
-	}
-
-	return msg
-}
 
 // func TestLintShell(t *testing.T) {
 // 	lintShell([]string{testLintRoot + "/" + goodBadFiles["shell"][0]})
@@ -51,23 +38,27 @@ func makeTestMessage(lintType, mapKeyName, wantResult string) string {
 
 func TestLintGo(t *testing.T) {
 	lintGo([]string{testLintRoot + "/" + goodBadFiles["go"][0]})
-	if _, oops := lintFailures["fmt-diff-check-go"]; oops {
-		t.Errorf(makeTestMessage("go", "fmt-diff-check-go", "wantPass"), lintFailures)
+	testTrackerData = getTrackerData()
+	testLintFailures = checkTrackerFailures(testTrackerData, "lint")
+	if testLintFailures > 0 {
+		t.Errorf(
+			"\nlintGo failed on either the format diff-check or the lint itself, but should have succeeded -- tracker data below:\n%v",
+			testTrackerData,
+		)
 	}
-	if _, oops := lintFailures["lint-go"]; oops {
-		t.Errorf(makeTestMessage("go", "lint-go", "wantPass"), lintFailures)
-	}
+	// resets the tracker file on disk
+	initTracker()
 
 	lintGo([]string{testLintRoot + "/" + goodBadFiles["go"][1]})
-	if lintFailures["fmt-diff-check-go"] != "fail" {
-		t.Errorf(makeTestMessage("go", "fmt-diff-check-go", "wantFail"), lintFailures)
+	testTrackerData = getTrackerData()
+	testLintFailures = checkTrackerFailures(testTrackerData, "lint")
+	if testLintFailures == 0 {
+		t.Errorf(
+			"\nlintGo succeeded on either the format diff-check or the lint itself, but should have failed -- tracker data below:\n%v",
+			testTrackerData,
+		)
 	}
-	if lintFailures["lint-go"] != "fail" {
-		t.Errorf(makeTestMessage("go", "lint-go", "wantFail"), lintFailures)
-	}
-
-	delete(lintFailures, "fmt-diff-check-go")
-	delete(lintFailures, "lint-go")
+	initTracker()
 }
 
 // func TestLintPython(t *testing.T) {
