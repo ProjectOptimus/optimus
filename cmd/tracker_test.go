@@ -72,3 +72,15 @@ func TestGetTrackerData(t *testing.T) {
 
 	initTracker()
 }
+
+func TestCheckTrackerFailures(t *testing.T) {
+	writeTrackerRecord(basicTestTrackerRecord)
+	trackerData := getTrackerData()
+	gotFailures := checkTrackerFailures(trackerData, "lint")
+	wantFailures := 1
+	if gotFailures != wantFailures {
+		t.Errorf("\nExpected to find %d failures in the tracker file, but found %d -- contents below:\n%s", wantFailures, gotFailures, trackerData)
+	}
+
+	initTracker()
+}
