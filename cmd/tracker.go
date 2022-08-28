@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -20,13 +21,35 @@ type TrackerRecord struct {
 	Type     string `json:"type"`     // What rhad subcommand this run represents (e.g. 'lint')
 	Subtype  string `json:"subtype"`  // A subtype label, if applicable (e.g. 'fmt-diff-check'). If this is zeroed, then Type == Subtype
 	Language string `json:"language"` // The language being processed, if applicable, such as during lint runs
-	Target   string `json:"target"`   // The target, if applicable (e.g. 'aws')
 	Tool     string `json:"tool"`     // What tool was used during the run (e.g. 'staticcheck')
+	Target   string `json:"target"`   // The target, if applicable (e.g. 'aws')
 	Result   string `json:"result"`   // Either 'pass' (or something informative) or 'fail'. 'fail' is what checkTrackerFailures looks for
 }
 
 func init() {
 	initTracker()
+}
+
+// String will let TrackerRecord print formatting be controllable, by satisying
+// the built-in Stringer interface
+func (t TrackerRecord) String() string {
+	record := fmt.Sprintf(`
+========
+Type: %s
+Subtype: %s
+Language: %s
+Tool: %s
+Target: %s
+Result: %s
+========`,
+		t.Type,
+		t.Subtype,
+		t.Language,
+		t.Tool,
+		t.Target,
+		t.Result,
+	)
+	return record
 }
 
 func initTracker() {

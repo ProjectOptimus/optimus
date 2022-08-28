@@ -48,7 +48,7 @@ func lintExecute(cmd *cobra.Command, args []string) {
 		osc.ErrorLog(nil, "One or more failures occurred during rhad's lint run! Summary:")
 		for _, record := range trackerData {
 			if record.Result == "fail" {
-				osc.ErrorLog(nil, "%v", record)
+				osc.ErrorLog(nil, "%s", record)
 			}
 		}
 		os.Exit(1)
@@ -71,6 +71,7 @@ func lintGo(args []string) {
 				Type:     "lint",
 				Subtype:  "go-fmt-diff-check",
 				Language: "go",
+				Tool:     "gofmt",
 				Result:   "fail",
 			})
 			osc.ErrorLog(nil, "Go format diff check failed!")
@@ -78,8 +79,8 @@ func lintGo(args []string) {
 			writeTrackerRecord(TrackerRecord{
 				Type:     "lint",
 				Subtype:  "fmt-diff-check",
-				Tool:     "go fmt",
 				Language: "go",
+				Tool:     "go fmt",
 				Result:   "pass",
 			})
 			osc.InfoLog("Go format diff check passed")
@@ -87,19 +88,24 @@ func lintGo(args []string) {
 
 		osc.InfoLog("Running Go linter...")
 		sc = osc.Syscall{
-			// []string{"staticcheck", staticcheckArg},
 			CmdLine: []string{"golangci-lint", "run", args[0]},
 		}
 		sc.Exec()
 		if !sc.Ok {
 			writeTrackerRecord(TrackerRecord{
 				Type:     "lint",
-				Tool:     "golangci-lint",
 				Language: "go",
-				Result:   "pass",
+				Tool:     "golangci-lint",
+				Result:   "fail",
 			})
 			osc.ErrorLog(nil, "Go linter failed!")
 		} else {
+			writeTrackerRecord(TrackerRecord{
+				Type:     "lint",
+				Language: "go",
+				Tool:     "golangci-lint",
+				Result:   "pass",
+			})
 			osc.InfoLog("Go linter passed")
 		}
 	}
