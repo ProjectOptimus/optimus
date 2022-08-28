@@ -29,14 +29,16 @@ To build & run `rhad` locally, you can clone this repo, and run:
     make image-build
 
 from the repo root. This will build (by default) an image tagged as
-`ociregistry.opensourcecorp.org/library/rhad:latest`. Please be patient, as
-`rhad` has a lot of build-time dependencies that it needs to fetch; and note
-that the resulting image will be quite large!
+`ociregistry.opensourcecorp.org/library/rhad:latest` -- though images are
+currently built & hosted on GitHub Container Registry
+(`ghcr.io/opensourcecorp/rhad`). Please be patient, as `rhad` has a lot of
+build-time dependencies that it needs to fetch; and note that the resulting
+image will be quite large!
 
 To actually run `rhad`, you will need to run the image's container with your
 local folder mounted to it:
 
-    docker run --rm -it -v "${PWD}":/home/rhad/src ociregistry.opensourcecorp.org/library/rhad:latest <subcommand> # e.g. 'lint'
+    docker run --rm -it -v "${PWD}":/home/rhad/src ghcr.io/opensourcecorp/rhad:latest <subcommand> # e.g. 'lint'
 
 Note that `rhad`'s instructions are provided within a container runtime context
 only. As `rhad` depends on many system & CLI utilities being present at runtime,
