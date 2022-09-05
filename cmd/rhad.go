@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
+	"path/filepath"
 
 	osc "github.com/opensourcecorp/go-common"
 	"github.com/spf13/cobra"
@@ -16,10 +16,7 @@ var (
 	// up paths relative to the binary, etc
 	rhadSrc string
 
-	// rhadFile (defined in fsutils.go) represents the Rhadfile configuration,
-	// which are collections of rhadConfigs
-	rf rhadFile
-	// rc rhadConfig
+	rf Rhadfile
 
 	rootCmd = &cobra.Command{
 		Use:   "rhad",
@@ -32,10 +29,19 @@ var (
 
 func init() {
 	var ok bool
+	var err error
 
 	rhadSrc, ok = os.LookupEnv("RHAD_SRC")
 	if !ok {
-		rhadSrc = "/home/rhad/rhad-src"
+		rhadSrc, err = filepath.Abs(".")
+		if err != nil {
+			osc.FatalLog(err, "Error trying to determine default absolute filepath to rhad's sourcecode root")
+		}
+	} else {
+		_, err = os.Lstat(rhadSrc)
+		if err != nil {
+			osc.FatalLog(err, "Env var 'RHAD_SRC' was provided, but set to a nonexistant directory")
+		}
 	}
 
 	if os.Getenv("RHAD_TESTING") == "true" {
@@ -47,26 +53,28 @@ func init() {
 func Execute() {
 	var err error
 
-	rf = readRhadfile()
-	for path := range rf {
-		// Get rid of the brackets around INI section names
-		for _, e := range []string{"[", "]"} {
-			path = strings.ReplaceAll(path, e, "")
-		}
-		if path == "DEFAULT" { // INI's default, top-level section
-			continue
-		}
-		err = os.Chdir(path)
+	rf, _ = readRhadfile()
+	for module := range rf.Modules {
+		// Rhadfile section
+		// Rhadfile section keys are subdirectory names in the tree, so we can
+		// also use them as path names where we need to
+		modulePath, err := filepath.Abs(module)
 		if err != nil {
-			osc.FatalLog(err, "Could not set working directory to '%s' for rhad on startup", path)
+			osc.FatalLog(err, "Error when construction absolute filepath to provided module '%s'", module)
 		}
-
-		// rc = cfg
+		err = os.Chdir(modulePath)
+		if err != nil {
+			osc.FatalLog(err, "Could not set working directory to '%s' for rhad on startup", module)
+		}
 
 		err = rootCmd.Execute()
 		if err != nil {
-			os.Exit(1)
+			osc.FatalLog(err, "Unhandled error when executing rhad subcommands, caught at top-level")
 		}
+	}
+	err = os.Chdir(rhadSrc)
+	if err != nil {
+		osc.FatalLog(err, "Could not reset working directory to rhad root '%s' for rhad on finish", rhadSrc)
 	}
 }
 

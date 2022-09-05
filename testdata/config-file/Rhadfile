@@ -1,0 +1,8 @@
+[module.root]
+version = 'v0.1.0'
+
+[module.imgbuilder]
+version = 'v1.0.0'
+
+[module.datastore]
+version = 'v0.2.0'
