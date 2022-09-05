@@ -18,27 +18,32 @@ var (
 	}
 )
 
-func TestLintGo(t *testing.T) {
-	lintGo([]string{testLintRoot + "/" + goodBadFiles["go"][0]})
-	testTrackerData = getTrackerData()
-	testLintFailures = checkTrackerFailures(testTrackerData, "lint")
-	if testLintFailures > 0 {
-		t.Errorf(
-			"\nlintGo failed on either the format diff-check or the lint itself, but should have succeeded -- tracker data below:\n%v",
-			testTrackerData,
-		)
-	}
-	// resets the tracker file on disk
-	initTracker()
+func TestLint(t *testing.T) {
 
-	lintGo([]string{testLintRoot + "/" + goodBadFiles["go"][1]})
-	testTrackerData = getTrackerData()
-	testLintFailures = checkTrackerFailures(testTrackerData, "lint")
-	if testLintFailures == 0 {
-		t.Errorf(
-			"\nlintGo succeeded on either the format diff-check or the lint itself, but should have failed -- tracker data below:\n%v",
-			testTrackerData,
-		)
-	}
-	initTracker()
+	t.Run("Lint Go and pass", func(t *testing.T) {
+		lintGo([]string{testLintRoot + "/" + goodBadFiles["go"][0]})
+		testTrackerData = getTrackerData()
+		testLintFailures = checkTrackerFailures(testTrackerData, "lint")
+		if testLintFailures > 0 {
+			t.Errorf(
+				"\nlintGo failed on either the format diff-check or the lint itself, but should have succeeded -- tracker data below:\n%v",
+				testTrackerData,
+			)
+		}
+		// resets the tracker file on disk
+		initTracker()
+	})
+
+	t.Run("Lint Go and fail", func(t *testing.T) {
+		lintGo([]string{testLintRoot + "/" + goodBadFiles["go"][1]})
+		testTrackerData = getTrackerData()
+		testLintFailures = checkTrackerFailures(testTrackerData, "lint")
+		if testLintFailures == 0 {
+			t.Errorf(
+				"\nlintGo succeeded on either the format diff-check or the lint itself, but should have failed -- tracker data below:\n%v",
+				testTrackerData,
+			)
+		}
+		initTracker()
+	})
 }

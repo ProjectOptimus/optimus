@@ -3,6 +3,9 @@ FROM debian:unstable
 # Go's staticcheck linter complains unless this is set
 ENV GOFLAGS -buildvcs=false
 
+# rhad will check for this to set its focus accordingly
+ENV RHAD_SRC '/home/rhad/rhad-src'
+
 WORKDIR /root
 
 COPY ./scripts/sysinit.sh ./scripts/sysinit.sh
@@ -37,4 +40,3 @@ RUN make build && \
 WORKDIR /home/rhad/src
 
 ENTRYPOINT ["/home/rhad/rhad-src/rhad"]
-CMD ["all"]

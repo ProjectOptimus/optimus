@@ -2,67 +2,77 @@ package cmd
 
 import (
 	"os"
-	"strings"
+	"path/filepath"
 
+	"github.com/BurntSushi/toml"
 	osc "github.com/opensourcecorp/go-common"
-	"gopkg.in/ini.v1"
 )
 
-// rhadConfig represents each section's contents of a Rhadfile
-type rhadConfig struct {
-	Version string `ini:"version"`
+// A Rhadfile represents all sections (rhadModules) together in a real Rhadfile
+type Rhadfile struct {
+	Modules map[string]rhadModule `toml:"module"`
 }
 
-// rhadFile represents all sections (rhadConfigs) together in a Rhadfile, with
-// section names as keys
-type rhadFile map[string]rhadConfig
+// rhadModule defines each tree branch to traverse in the codebase
+type rhadModule struct {
+	Version string `toml:"version"`
+}
 
-// readRhadfile reads in the Rhadfile provided, and unmarshalls it into
-// something usable elsewhere. Currently, Rhadfiles are in the INI format.
-func readRhadfile() rhadFile {
+// readRhadfile reads in the Rhadfile provided, and unpacks it into something
+// usable elsewhere. Currently, Rhadfiles are in the TOML format. The hacky
+// `rhadfilePath` parameter allows for internal setting of the Rhadfile path
+// (such as during tests), but will default to searching the current directory
+// if not provided.
+func readRhadfile(customRhadfilePath ...string) (Rhadfile, toml.MetaData) {
 	var err error
-	var rawContents *ini.File
+	var rhadfileData Rhadfile
+	var metadata toml.MetaData
 
-	rhadfilePath := "./Rhadfile"
-	_, err = os.Lstat(string(rhadfilePath))
+	var rhadfilePath string
+	if len(customRhadfilePath) == 0 {
+		rhadfilePath = "./Rhadfile"
+	} else {
+		rhadfilePath = customRhadfilePath[0]
+	}
+
+	rhadfilePath, err = filepath.Abs(rhadfilePath)
 	if err != nil {
-		osc.WarnLog("No Rhadfile found, so just processing this root directory")
-		rawContents, err = ini.Load([]byte("[.]"))
-		if err != nil {
-			osc.FatalLog(err, "Error while loading default Rhadfile contents")
+		osc.FatalLog(err, "Error when determining the absolute path of ./Rhadfile")
+	}
+
+	_, err = os.Lstat(rhadfilePath)
+	if err != nil {
+		osc.WarnLog("No Rhadfile found, so rhad will only process this root directory, and without configuration options. Create a top-level 'Rhadfile' with a '[module.root]' TOML table.")
+		// This is a "default" Rhadfile -- we need to return one or else the
+		// outer loop in the caller will fail to run without any error. The
+		// module path for a single-level Rhadfile can either be "root" or ".",
+		// both of which we will translate to the latter
+		rhadfileData = Rhadfile{
+			Modules: map[string]rhadModule{
+				".": {Version: "v0.0.1"},
+			},
 		}
 	} else {
-		rawContents, err = ini.Load(rhadfilePath)
+		metadata, err = toml.DecodeFile(rhadfilePath, &rhadfileData)
 		if err != nil {
-			osc.FatalLog(err, "Error while reading Rhadfile")
+			osc.FatalLog(err, "Error while reading or parsing Rhadfile")
+		}
+
+		// Another catch for when rhad may fail entirely silently -- typos like
+		// specifying module blocks in TOML as 'modules.X' instead of
+		// 'module.X', etc.
+		if len(metadata.Undecoded()) > 0 {
+			osc.WarnLog("Undecoded field in Rhadfile detected, and rhad may break -- you might have made a typo somewhere. Undecoded fields: %q", metadata.Undecoded())
+		}
+
+		// Here's where we need to replace a possible 'root' module path key
+		// with a real resolvable directory name
+		if _, ok := rhadfileData.Modules["root"]; ok {
+			osc.InfoLog("Found 'root' module name in Rhadfile -- will treat that as the top-level directory '.'")
+			rhadfileData.Modules["."] = rhadfileData.Modules["root"]
+			delete(rhadfileData.Modules, "root")
 		}
 	}
 
-	var cfg rhadConfig
-	rf := make(rhadFile)
-
-	for _, section := range rawContents.SectionStrings() {
-		err = rawContents.Section(section).MapTo(&cfg)
-		if err != nil {
-			osc.FatalLog(err, "Could not map Rhadfile contents in section '%s' to struct", section)
-		}
-
-		sectionClean := cleanSectionName(section)
-
-		rf[sectionClean] = cfg
-	}
-
-	return rf
-}
-
-// cleanSectionName takes INI section headers, and cleans them into a consistent
-// format for reuse (the INI specification doesn't enforce spacing, etc. in
-// section names)
-func cleanSectionName(s string) string {
-	for _, e := range []string{"[", "]", "./"} {
-		s = strings.ReplaceAll(s, e, "")
-	}
-	s = strings.TrimSpace(s)
-	s = "[" + s + "]" // gotta put them back for the INI package
-	return s
+	return rhadfileData, metadata
 }

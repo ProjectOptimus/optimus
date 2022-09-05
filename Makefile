@@ -55,3 +55,10 @@ clean:
 # run 'make clean' within the container
 image-build: clean
 	@$(DOCKER) build -f Containerfile -t $(OCI_REGISTRY)/$(OCI_REGISTRY_OWNER)/$(PKGNAME):latest .
+
+# Some targets that help set up local workstations with rhad tooling. Assumes
+# ~/.local/bin is on $PATH
+add-local-symlinks:
+	@mkdir -p "${HOME}"/.local/bin
+	@ln -fs $(realpath ./scripts/run-rhad-lint.sh) "${HOME}"/.local/bin/run-rhad-lint
+	@printf 'Symlinked rhad lint runner script to %s\n' "${HOME}"/.local/bin/run-rhad-lint
