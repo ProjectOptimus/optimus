@@ -4,8 +4,8 @@ PKGNAME := rhad
 BINNAME := rhad
 
 DOCKER ?= docker
-OCI_REGISTRY ?= ociregistry.opensourcecorp.org
-OCI_REGISTRY_OWNER ?= library
+OCI_REGISTRY ?= ghcr.io# ociregistry.opensourcecorp.org
+OCI_REGISTRY_OWNER ?= opensourcecorp# library
 
 all: test clean
 

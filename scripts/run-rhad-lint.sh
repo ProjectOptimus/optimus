@@ -40,7 +40,7 @@ run-rhad-lint() {
   docker run \
     --rm -it \
     -v "${PWD}":/home/rhad/src \
-    ociregistry.opensourcecorp.org/library/rhad:latest lint \
+    ghcr.io/opensourcecorp/rhad:latest lint \
   || result="$?"
   return "${result}"
 }

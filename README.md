@@ -7,13 +7,7 @@ rhad
 [![Support OpenSourceCorp on Ko-Fi!](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/ryapric)
 <!-- badges: end -->
 
----
-
->King Rhadamanthus has found you worthy
-
----
-
-`rhadamanthus` ("`rhad`") is a CI/CD task runner used in [OpenSourceCorp's CI/CD
+`rhad` ("`rhadamanthus`") is a CI/CD task runner used in [OpenSourceCorp's CI/CD
 subsystem](https://github.com/opensourcecorp/osc-infra/tree/main/cicd). It does
 not orchestrate CI/CD tasks -- that's the subsystem's job. Rather, it is a set
 of utilities that are designed to be easily ported between any CI/CD platform of
@@ -29,9 +23,7 @@ To build & run `rhad` locally, you can clone this repo, and run:
     make image-build
 
 from the repo root. This will build (by default) an image tagged as
-`ociregistry.opensourcecorp.org/library/rhad:latest` -- though images are
-currently built & hosted on GitHub Container Registry
-(`ghcr.io/opensourcecorp/rhad`). Please be patient, as `rhad` has a lot of
+`ghcr.io/opensourcecorp/rhad:latest`. Please be patient, as `rhad` has a lot of
 build-time dependencies that it needs to fetch; and note that the resulting
 image will be quite large!
 
