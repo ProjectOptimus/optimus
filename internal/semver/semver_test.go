@@ -1,6 +1,14 @@
-package cmd
+package semver
 
-import "testing"
+import (
+	"testing"
+
+	osc "github.com/opensourcecorp/go-common"
+)
+
+func init() {
+	osc.IsTesting = true
+}
 
 func TestGetSemver(t *testing.T) {
 	var want, got, s string // 's' is the version string from Rhadfile

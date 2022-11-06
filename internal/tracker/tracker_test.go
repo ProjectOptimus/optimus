@@ -1,4 +1,4 @@
-package cmd
+package tracker
 
 import (
 	"errors"
@@ -20,6 +20,10 @@ var (
 	}
 )
 
+func init() {
+	osc.IsTesting = true
+}
+
 func TestInitTracker(t *testing.T) {
 	if _, err := os.Stat(trackerPath); errors.Is(err, os.ErrNotExist) {
 		t.Errorf("rhad tracker file does not exist -- it should have been created at init time")
@@ -27,7 +31,7 @@ func TestInitTracker(t *testing.T) {
 }
 
 func TestWriteTrackerRecord(t *testing.T) {
-	writeTrackerRecord(basicTestTrackerRecord)
+	WriteTrackerRecord(basicTestTrackerRecord)
 	// Raw bytes read instead of getTrackerData(), so we can a) test the bytes
 	// written and b) debug if getTrackerData() tests fail
 	trackerFileBytes, err := os.ReadFile(trackerPath)
@@ -45,12 +49,12 @@ func TestWriteTrackerRecord(t *testing.T) {
 		)
 	}
 
-	initTracker()
+	InitTracker()
 }
 
 func TestGetTrackerData(t *testing.T) {
-	writeTrackerRecord(basicTestTrackerRecord)
-	trackerData := getTrackerData()
+	WriteTrackerRecord(basicTestTrackerRecord)
+	trackerData := GetTrackerData()
 	if trackerData[0].Type != "lint" {
 		t.Errorf("Expected tracker record field 'Type' to be 'lint', but got '%v'", trackerData[0].Type)
 	}
@@ -70,17 +74,17 @@ func TestGetTrackerData(t *testing.T) {
 		t.Errorf("Expected tracker record field 'Result' to be 'fail', but got '%v'", trackerData[0].Result)
 	}
 
-	initTracker()
+	InitTracker()
 }
 
 func TestCheckTrackerFailures(t *testing.T) {
-	writeTrackerRecord(basicTestTrackerRecord)
-	trackerData := getTrackerData()
-	gotFailures := checkTrackerFailures(trackerData, "lint")
+	WriteTrackerRecord(basicTestTrackerRecord)
+	trackerData := GetTrackerData()
+	gotFailures := CheckTrackerFailures(trackerData, "lint")
 	wantFailures := 1
 	if gotFailures != wantFailures {
 		t.Errorf("\nExpected to find %d failures in the tracker file, but found %d -- contents below:\n%s", wantFailures, gotFailures, trackerData)
 	}
 
-	initTracker()
+	InitTracker()
 }

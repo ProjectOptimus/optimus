@@ -1,4 +1,4 @@
-package cmd
+package fsutils
 
 import (
 	"io/fs"
@@ -54,16 +54,15 @@ func getAllFiles(root string) []fileData {
 	return files
 }
 
-// getRelevantFiles extracts files and/or directories by traversing some root
+// GetRelevantFiles extracts files and/or directories by traversing some root
 // path, based on some regular expression pattern provided.
-func getRelevantFiles(root, pattern string) []fileData {
+func GetRelevantFiles(root, pattern string) []fileData {
 	allFiles := getAllFiles(root)
 	regex := regexp.MustCompile(pattern)
-	ignoreRegex := regexp.MustCompile(ignorePattern)
 	var files []fileData
 
 	for _, file := range allFiles {
-		if regex.MatchString(file.Path) && !ignoreRegex.MatchString(file.Path) {
+		if regex.MatchString(file.Path) {
 			files = append(files, file)
 		}
 	}

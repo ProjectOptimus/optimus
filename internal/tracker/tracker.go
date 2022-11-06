@@ -1,4 +1,4 @@
-package cmd
+package tracker
 
 import (
 	"bytes"
@@ -27,7 +27,7 @@ type TrackerRecord struct {
 }
 
 func init() {
-	initTracker()
+	InitTracker()
 }
 
 // String will let TrackerRecord print formatting be controllable, by satisying
@@ -52,7 +52,7 @@ Result: %s
 	return record
 }
 
-func initTracker() {
+func InitTracker() {
 	os.Remove(trackerPath)
 	_, err := os.Create(trackerPath)
 	if err != nil {
@@ -60,7 +60,7 @@ func initTracker() {
 	}
 }
 
-func writeTrackerRecord(t TrackerRecord) {
+func WriteTrackerRecord(t TrackerRecord) {
 	f, err := os.OpenFile(trackerPath, os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
 		osc.FatalLog(err, "Could not open rhad's tracker file at '%s' for writing", trackerPath)
@@ -77,7 +77,7 @@ func writeTrackerRecord(t TrackerRecord) {
 	}
 }
 
-func getTrackerData() []TrackerRecord {
+func GetTrackerData() []TrackerRecord {
 	trackerFileBytes, err := os.ReadFile(trackerPath)
 	if err != nil {
 		osc.FatalLog(err, "Could not open rhad's tracker file at '%s'", trackerPath)
@@ -98,7 +98,7 @@ func getTrackerData() []TrackerRecord {
 	return trackerData
 }
 
-func checkTrackerFailures(trackerData []TrackerRecord, trackerType string) int {
+func CheckTrackerFailures(trackerData []TrackerRecord, trackerType string) int {
 	var failures int
 	for _, record := range trackerData {
 		if record.Result == "fail" && record.Type == trackerType {

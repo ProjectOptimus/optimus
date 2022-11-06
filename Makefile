@@ -12,7 +12,8 @@ all: test clean
 .PHONY: %
 
 test: clean
-	@OSC_IS_TESTING=true go test -v -cover ./...
+	@printf 'Running go vet first...\n' && go vet ./... && printf 'Ok.\n'
+	@OSC_IS_TESTING=true go test -cover ./...
 
 build: clean
 	@mkdir -p build/$$(go env GOOS)-$$(go env GOARCH)

@@ -1,16 +1,21 @@
-package cmd
+package fsutils
 
 import (
 	"path/filepath"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	osc "github.com/opensourcecorp/go-common"
 )
+
+var testingRoot = "../../testdata/fsutils"
+
+func init() {
+	osc.IsTesting = true
+}
 
 func TestGetAllFiles(t *testing.T) {
 	var want, got []fileData
-
-	testingRoot := "../testdata/fsutils"
 
 	// Make sure these are lexically sorted, all dirs & contents and then
 	// top-level files
@@ -34,13 +39,11 @@ func TestGetRelevantFiles(t *testing.T) {
 	var want []fileData
 	var got []fileData
 
-	testingRoot := "../testdata/fsutils"
-
 	want = []fileData{
 		{filepath.Join(testingRoot, "test.go"), false},
 		{filepath.Join(testingRoot, "test.json"), false},
 	}
-	got = getRelevantFiles(testingRoot, `(\.go|\.json)`)
+	got = GetRelevantFiles(testingRoot, `(\.go|\.json)`)
 	if !cmp.Equal(want, got) {
 		t.Errorf("\nWant: %v\nGot:  %v\n", want, got)
 	}

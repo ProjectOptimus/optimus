@@ -1,4 +1,4 @@
-package cmd
+package rhadfile
 
 import (
 	"bytes"
@@ -11,7 +11,11 @@ import (
 	osc "github.com/opensourcecorp/go-common"
 )
 
-var testRhadfilePath, _ = filepath.Abs("../testdata/config-file/Rhadfile")
+var testRhadfilePath, _ = filepath.Abs("../../testdata/config-file/Rhadfile")
+
+func init() {
+	osc.IsTesting = true
+}
 
 func TestReadRhadfile(t *testing.T) {
 	t.Run("Valid Rhadfile can be read", func(t *testing.T) {
@@ -22,7 +26,7 @@ func TestReadRhadfile(t *testing.T) {
 				"datastore":  {Version: "v0.2.0"},
 			},
 		}
-		got, _ := readRhadfile(testRhadfilePath)
+		got, _ := ReadRhadfile(testRhadfilePath)
 
 		if !cmp.Equal(want, got) {
 			t.Errorf("\nDid not match expected Rhadfile contents:\nwant: %v\ngot: %v", want, got)
@@ -43,7 +47,7 @@ func TestReadRhadfile(t *testing.T) {
 		// get emitted, and to the right place
 		osc.IsTesting = false
 		osc.WarnLogger.SetOutput(&buf)
-		readRhadfile(badfilePath)
+		ReadRhadfile(badfilePath)
 		osc.WarnLogger.SetOutput(os.Stderr)
 		osc.IsTesting = true
 

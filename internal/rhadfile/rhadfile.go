@@ -1,4 +1,4 @@
-package cmd
+package rhadfile
 
 import (
 	"os"
@@ -18,12 +18,12 @@ type rhadModule struct {
 	Version string `toml:"version"`
 }
 
-// readRhadfile reads in the Rhadfile provided, and unpacks it into something
+// ReadRhadfile reads in the Rhadfile provided, and unpacks it into something
 // usable elsewhere. Currently, Rhadfiles are in the TOML format. The hacky
 // `rhadfilePath` parameter allows for internal setting of the Rhadfile path
 // (such as during tests), but will default to searching the current directory
 // if not provided.
-func readRhadfile(customRhadfilePath ...string) (Rhadfile, toml.MetaData) {
+func ReadRhadfile(customRhadfilePath ...string) (Rhadfile, toml.MetaData) {
 	var err error
 	var rhadfileData Rhadfile
 	var metadata toml.MetaData
