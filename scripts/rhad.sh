@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Script to kick off rhad's linting utilities. Serves as both a reference as
-# well as a means to run the linting process on a local machine.
+# Script to kick off rhad's utilities. Serves as both a reference as well as a
+# means to run the rhad subcommands on a local machine.
 
-run-github-super-linter() {
+cmd="${1}"
+if [[ -z "${cmd}" ]]; then
+  printf 'ERROR: must specify a valid rhad subcommand as script arg\n'
+fi
+
+github-super-linter() {
   # Clean up after any last runs, because it'll creep on its own files
   rm -rf ./super-linter.log ./*cache*
 
@@ -35,15 +40,39 @@ run-github-super-linter() {
   return "${result}"
 }
 
-run-rhad-lint() {
+rhad-lint() {
   local result=0
   docker run \
     --rm -it \
     -v "${PWD}":/home/rhad/src \
-    ghcr.io/opensourcecorp/rhad:latest lint \
+    ghcr.io/opensourcecorp/rhad:latest \
+  lint \
   || result="$?"
   return "${result}"
 }
 
-run-github-super-linter
-run-rhad-lint
+rhad-test() {
+  printf 'Not implemented.\n'
+  return 1
+}
+
+rhad-build() {
+  printf 'Not implemented.\n'
+  return 1
+}
+
+case "${cmd}" in
+  lint)
+    github-super-linter
+    rhad-lint
+  ;;
+  test)
+    rhad-test
+  ;;
+  build)
+    rhad-build
+  ;;
+  *)
+    printf 'ERROR: must specify a valid rhad subcommand as script arg\n'
+  ;;
+esac

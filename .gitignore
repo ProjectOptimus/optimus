@@ -2,5 +2,6 @@
 *cache*
 *.log
 
+*.out
 build/
 dist/

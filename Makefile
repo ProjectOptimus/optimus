@@ -61,5 +61,5 @@ image-build: clean
 # ~/.local/bin is on $PATH
 add-local-symlinks:
 	@mkdir -p "${HOME}"/.local/bin
-	@ln -fs $(realpath ./scripts/run-rhad-lint.sh) "${HOME}"/.local/bin/run-rhad-lint
-	@printf 'Symlinked rhad lint runner script to %s\n' "${HOME}"/.local/bin/run-rhad-lint
+	@ln -fs $(realpath ./scripts/rhad.sh) "${HOME}"/.local/bin/rhad
+	@printf 'Symlinked rhad runner script to %s\n' "${HOME}"/.local/bin/rhad

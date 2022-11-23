@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/BurntSushi/toml v1.2.0
 	github.com/google/go-cmp v0.5.8
-	github.com/opensourcecorp/go-common v0.2.0
+	github.com/opensourcecorp/go-common v0.3.1
 	github.com/spf13/cobra v1.4.0
 	golang.org/x/mod v0.5.1
 )
