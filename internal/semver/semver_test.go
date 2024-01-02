@@ -11,7 +11,7 @@ func init() {
 }
 
 func TestGetSemver(t *testing.T) {
-	var want, got, s string // 's' is the version string from Rhadfile
+	var want, got, s string // 's' is the version string from Oscarfile
 
 	t.Run("Convert regular semver to be conformant", func(t *testing.T) {
 		s = "1.0.0.0"

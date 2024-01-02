@@ -44,7 +44,7 @@ func getSemver(s string) string {
 	}
 
 	if !semver.IsValid(v) {
-		osc.FatalLog(nil, "Could not understand the semantic version you provided in your Rhadfile: '%s'", s)
+		osc.FatalLog(nil, "Could not understand the semantic version you provided in your Oscarfile: '%s'", s)
 	}
 
 	if v != s {

@@ -1,7 +1,7 @@
 # I mostly copied this straight from here:
 # https://docs.github.com/en/actions/publishing-packages/publishing-docker-images
 
-# rhad's tests, etc. run during image build, so that's all this pipeline does
+# oscar's tests, etc. run during image build, so that's all this pipeline does
 
 name: main
 
@@ -35,7 +35,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v4
       with:
-        images: ghcr.io/opensourcecorp/rhad
+        images: ghcr.io/opensourcecorp/oscar
         tags: |
           type=sha
 
@@ -57,7 +57,7 @@ jobs:
         context: .
         file: Containerfile
         push: true
-        tags: ghcr.io/opensourcecorp/rhad:latest
+        tags: ghcr.io/opensourcecorp/oscar:latest
 
 
 # name: main

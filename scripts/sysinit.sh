@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This script prepares (and validates) the rhad host
+# This script prepares (and validates) the oscar host
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -23,7 +23,7 @@ init-sys() {
   {
     apt-get update
     apt-get install -y "${pkgs[@]}"
-  } || errorf "Could not init system packages for rhad!"
+  } || errorf "Could not init system packages for oscar!"
 }
 
 init-bats() {
@@ -50,7 +50,7 @@ init-python() {
     pytest-cov
   )
   pip3 install --user "${pkgs[@]}" \
-  || errorf "Could not init Python packages for rhad!"
+  || errorf "Could not init Python packages for oscar!"
 }
 
 test-sysinit() {
@@ -71,7 +71,7 @@ test-sysinit() {
     }
   done
   if [[ -n "${failed}" ]]; then
-    errorf '^ Above command(s) not found on PATH -- did you run the sysinit script for rhad?'
+    errorf '^ Above command(s) not found on PATH -- did you run the sysinit script for oscar?'
   fi
 }
 
@@ -79,10 +79,10 @@ main() {
   if [[ $(id -u) -eq 0 ]]; then
     init-sys
     init-bats
-  else  
+  else
     init-go
     init-python
-    
+
     # Also run tests as nonroot, so setup is confirmed for the least-privileged user
     test-sysinit
   fi
@@ -92,7 +92,7 @@ main() {
 if [[ "${1:-}" == "test" ]]; then
   test-sysinit
 elif [[ "${BASH_SOURCE[0]:-}" == "${0}" ]]; then
-  main || errorf "Failed to initialize rhad host!"
+  main || errorf "Failed to initialize oscar host!"
 fi
 
 exit 0

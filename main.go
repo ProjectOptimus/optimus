@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	osc "github.com/opensourcecorp/go-common"
-	"github.com/opensourcecorp/rhad/cmd"
+	"github.com/opensourcecorp/oscar/cmd"
 )
 
 func main() {
-	osc.SetLoggerPrefixName("rhad")
+	osc.SetLoggerPrefixName("oscar")
 
-	osc.InfoLog("Firing up rhad!")
+	osc.InfoLog("Firing up oscar!")
 
 	banner := osc.Dedent(`
 		  ______________________________

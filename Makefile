@@ -1,7 +1,7 @@
 SHELL = /usr/bin/env bash -euo pipefail
 
-PKGNAME := rhad
-BINNAME := rhad
+PKGNAME := oscar
+BINNAME := oscar
 
 DOCKER ?= docker
 OCI_REGISTRY ?= ghcr.io# ociregistry.opensourcecorp.org
@@ -57,9 +57,9 @@ clean:
 image-build: clean
 	@$(DOCKER) build -f Containerfile -t $(OCI_REGISTRY)/$(OCI_REGISTRY_OWNER)/$(PKGNAME):latest .
 
-# Some targets that help set up local workstations with rhad tooling. Assumes
+# Some targets that help set up local workstations with oscar tooling. Assumes
 # ~/.local/bin is on $PATH
 add-local-symlinks:
 	@mkdir -p "${HOME}"/.local/bin
-	@ln -fs $(realpath ./scripts/rhad.sh) "${HOME}"/.local/bin/rhad
-	@printf 'Symlinked rhad runner script to %s\n' "${HOME}"/.local/bin/rhad
+	@ln -fs $(realpath ./scripts/oscar.sh) "${HOME}"/.local/bin/oscar
+	@printf 'Symlinked oscar runner script to %s\n' "${HOME}"/.local/bin/oscar

@@ -26,7 +26,7 @@ func init() {
 
 func TestInitTracker(t *testing.T) {
 	if _, err := os.Stat(trackerPath); errors.Is(err, os.ErrNotExist) {
-		t.Errorf("rhad tracker file does not exist -- it should have been created at init time")
+		t.Errorf("oscar tracker file does not exist -- it should have been created at init time")
 	}
 }
 
@@ -36,7 +36,7 @@ func TestWriteTrackerRecord(t *testing.T) {
 	// written and b) debug if getTrackerData() tests fail
 	trackerFileBytes, err := os.ReadFile(trackerPath)
 	if err != nil {
-		osc.FatalLog(err, "Couldn't read from rhad's tracker file during test")
+		osc.FatalLog(err, "Couldn't read from oscar's tracker file during test")
 	}
 	hasResult, err := regexp.Match(`"result": ?"fail"`, trackerFileBytes)
 	if err != nil {

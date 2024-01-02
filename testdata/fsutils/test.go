@@ -1,2 +1,2 @@
-// Just because rhad itself complains about this
+// Just because oscar itself complains about this
 package testdata

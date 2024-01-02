@@ -12,13 +12,13 @@ import (
 )
 
 var (
-	trackerPath = path.Join(os.TempDir(), "rhad-tracker")
+	trackerPath = path.Join(os.TempDir(), "oscar-tracker")
 )
 
 // Tracker collects and represents the JSON record structure of the tracker file
 // contents
 type TrackerRecord struct {
-	Type     string `json:"type"`     // What rhad subcommand this run represents (e.g. 'lint')
+	Type     string `json:"type"`     // What oscar subcommand this run represents (e.g. 'lint')
 	Subtype  string `json:"subtype"`  // A subtype label, if applicable (e.g. 'fmt-diff-check'). If this is zeroed, then Type == Subtype
 	Language string `json:"language"` // The language being processed, if applicable, such as during lint runs
 	Tool     string `json:"tool"`     // What tool was used during the run (e.g. 'staticcheck')
@@ -56,14 +56,14 @@ func InitTracker() {
 	os.Remove(trackerPath)
 	_, err := os.Create(trackerPath)
 	if err != nil {
-		osc.FatalLog(err, "Could not open or create rhad's tracker file at '%s'", trackerPath)
+		osc.FatalLog(err, "Could not open or create oscar's tracker file at '%s'", trackerPath)
 	}
 }
 
 func WriteTrackerRecord(t TrackerRecord) {
 	f, err := os.OpenFile(trackerPath, os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
-		osc.FatalLog(err, "Could not open rhad's tracker file at '%s' for writing", trackerPath)
+		osc.FatalLog(err, "Could not open oscar's tracker file at '%s' for writing", trackerPath)
 	}
 	defer f.Close()
 
@@ -73,14 +73,14 @@ func WriteTrackerRecord(t TrackerRecord) {
 	}
 
 	if _, err = f.Write(recordBytes); err != nil {
-		osc.FatalLog(err, "Could not write to rhad's tracker file")
+		osc.FatalLog(err, "Could not write to oscar's tracker file")
 	}
 }
 
 func GetTrackerData() []TrackerRecord {
 	trackerFileBytes, err := os.ReadFile(trackerPath)
 	if err != nil {
-		osc.FatalLog(err, "Could not open rhad's tracker file at '%s'", trackerPath)
+		osc.FatalLog(err, "Could not open oscar's tracker file at '%s'", trackerPath)
 	}
 
 	var trackerData []TrackerRecord
@@ -91,7 +91,7 @@ func GetTrackerData() []TrackerRecord {
 			break
 		} else if err != nil {
 			// TODO: *which* line couldn't be processed?
-			osc.FatalLog(err, "Could not process one or more lines of rhad's tracker file")
+			osc.FatalLog(err, "Could not process one or more lines of oscar's tracker file")
 		}
 		trackerData = append(trackerData, record)
 	}

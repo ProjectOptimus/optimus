@@ -8,24 +8,24 @@ import (
 	osc "github.com/opensourcecorp/go-common"
 )
 
-func GetRhadSrc() string {
-	var rhadSrc string
+func GetOscarSrc() string {
+	var oscarSrc string
 	var err error
 
-	rhadSrc, ok := os.LookupEnv("RHAD_SRC")
+	oscarSrc, ok := os.LookupEnv("RHAD_SRC")
 	if !ok {
-		rhadSrc, err = filepath.Abs(".")
+		oscarSrc, err = filepath.Abs(".")
 		if err != nil {
-			osc.FatalLog(err, "Error trying to determine default absolute filepath to rhad's sourcecode root")
+			osc.FatalLog(err, "Error trying to determine default absolute filepath to oscar's sourcecode root")
 		}
 	} else {
-		_, err = os.Lstat(rhadSrc)
+		_, err = os.Lstat(oscarSrc)
 		if err != nil {
 			osc.FatalLog(err, "Env var 'RHAD_SRC' was provided, but set to a nonexistent directory")
 		}
 	}
 
-	return rhadSrc
+	return oscarSrc
 }
 
 func CheckIsTesting() bool {
@@ -41,10 +41,10 @@ func CheckIsTesting() bool {
 // osc.Syscall.Exec()s, so they hopefully catch runtime errors earlier
 func VerifySysinit() {
 	sc := osc.Syscall{
-		CmdLine: []string{"bash", GetRhadSrc() + "/scripts/sysinit.sh", "test"},
+		CmdLine: []string{"bash", GetOscarSrc() + "/scripts/sysinit.sh", "test"},
 	}
 	sc.Exec()
 	if !sc.Ok {
-		osc.FatalLog(nil, "This host has not been properly configured to use rhad -- please run rhad's sysinit first")
+		osc.FatalLog(nil, "This host has not been properly configured to use oscar -- please run oscar's sysinit first")
 	}
 }

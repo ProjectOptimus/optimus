@@ -3,40 +3,40 @@ FROM debian:unstable
 # Go's staticcheck linter complains unless this is set
 ENV GOFLAGS -buildvcs=false
 
-# rhad will check for this to set its focus accordingly
-ENV RHAD_SRC '/home/rhad/rhad-src'
+# oscar will check for this to set its focus accordingly
+ENV RHAD_SRC '/home/oscar/oscar-src'
 
 WORKDIR /root
 
 COPY ./scripts/sysinit.sh ./scripts/sysinit.sh
 RUN bash ./scripts/sysinit.sh
 
-RUN useradd --create-home rhad
-USER rhad
+RUN useradd --create-home oscar
+USER oscar
 RUN mkdir -p \
-      /home/rhad/rhad-src \
-      /home/rhad/src \
-      /home/rhad/.local/bin
-WORKDIR /home/rhad/rhad-src
+      /home/oscar/oscar-src \
+      /home/oscar/src \
+      /home/oscar/.local/bin
+WORKDIR /home/oscar/oscar-src
 
-ENV RHAD_SRC=/home/rhad/rhad-src
+ENV RHAD_SRC=/home/oscar/oscar-src
 
-# Set up PATH correctly for rhad user (I can't find a better way to do this)
-ENV PATH="/home/rhad/.local/bin:/home/rhad/go/bin:${PATH}"
+# Set up PATH correctly for oscar user (I can't find a better way to do this)
+ENV PATH="/home/oscar/.local/bin:/home/oscar/go/bin:${PATH}"
 
 # Sets up the rest of the non-root-needed installs; the script checks if the runner is root or not
 COPY ./scripts/sysinit.sh ./scripts/sysinit.sh
 RUN bash ./scripts/sysinit.sh
 
 # Ok now hopefully we're all cached up
-COPY --chown=rhad:rhad . .
+COPY --chown=oscar:oscar . .
 
 RUN go mod tidy
 RUN make test clean
 
 RUN make build && \
-    ln -fs build/linux-amd64/rhad ./rhad
+    ln -fs build/linux-amd64/oscar ./oscar
 
-WORKDIR /home/rhad/src
+WORKDIR /home/oscar/src
 
-ENTRYPOINT ["/home/rhad/rhad-src/rhad"]
+ENTRYPOINT ["/home/oscar/oscar-src/oscar"]

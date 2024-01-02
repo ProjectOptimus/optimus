@@ -1,4 +1,4 @@
-package rhadfile
+package oscarfile
 
 import (
 	"bytes"
@@ -11,34 +11,34 @@ import (
 	osc "github.com/opensourcecorp/go-common"
 )
 
-var testRhadfilePath, _ = filepath.Abs("../../testdata/config-file/Rhadfile")
+var testOscarfilePath, _ = filepath.Abs("../../testdata/config-file/Oscarfile")
 
 func init() {
 	osc.IsTesting = true
 }
 
-func TestReadRhadfile(t *testing.T) {
-	t.Run("Valid Rhadfile can be read", func(t *testing.T) {
-		want := Rhadfile{
-			Modules: map[string]rhadModule{
+func TestReadOscarfile(t *testing.T) {
+	t.Run("Valid Oscarfile can be read", func(t *testing.T) {
+		want := Oscarfile{
+			Modules: map[string]oscarModule{
 				".":          {Version: "v0.1.0"},
 				"imgbuilder": {Version: "v1.0.0"},
 				"datastore":  {Version: "v0.2.0"},
 			},
 		}
-		got, _ := ReadRhadfile(testRhadfilePath)
+		got, _ := ReadOscarfile(testOscarfilePath)
 
 		if !cmp.Equal(want, got) {
-			t.Errorf("\nDid not match expected Rhadfile contents:\nwant: %v\ngot: %v", want, got)
+			t.Errorf("\nDid not match expected Oscarfile contents:\nwant: %v\ngot: %v", want, got)
 		}
 	})
 
-	t.Run("Invalid Rhadfile fields throw a warning", func(t *testing.T) {
+	t.Run("Invalid Oscarfile fields throw a warning", func(t *testing.T) {
 		var err error
 
 		var buf bytes.Buffer
 
-		badfilePath, err := filepath.Abs("../testdata/config-file/Rhadfile_invalid")
+		badfilePath, err := filepath.Abs("../testdata/config-file/Oscarfile_invalid")
 		if err != nil {
 			t.Fatalf(err.Error())
 		}
@@ -47,7 +47,7 @@ func TestReadRhadfile(t *testing.T) {
 		// get emitted, and to the right place
 		osc.IsTesting = false
 		osc.WarnLogger.SetOutput(&buf)
-		ReadRhadfile(badfilePath)
+		ReadOscarfile(badfilePath)
 		osc.WarnLogger.SetOutput(os.Stderr)
 		osc.IsTesting = true
 
@@ -61,7 +61,7 @@ func TestReadRhadfile(t *testing.T) {
 			t.Fatalf(err.Error())
 		}
 		if !match {
-			t.Errorf("\nExpected a Rhadfile with invalid fields to throw a warning in the logs, but didn't see that. Log contents:\n%s", string(logs))
+			t.Errorf("\nExpected a Oscarfile with invalid fields to throw a warning in the logs, but didn't see that. Log contents:\n%s", string(logs))
 		}
 	})
 }

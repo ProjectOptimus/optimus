@@ -1,4 +1,4 @@
-module github.com/opensourcecorp/rhad
+module github.com/opensourcecorp/oscar
 
 go 1.18
 

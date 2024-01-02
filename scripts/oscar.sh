@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Script to kick off rhad's utilities. Serves as both a reference as well as a
-# means to run the rhad subcommands on a local machine.
+# Script to kick off oscar's utilities. Serves as both a reference as well as a
+# means to run the oscar subcommands on a local machine.
 
 cmd="${1}"
 if [[ -z "${cmd}" ]]; then
-  printf 'ERROR: must specify a valid rhad subcommand as script arg\n'
+  printf 'ERROR: must specify a valid oscar subcommand as script arg\n'
 fi
 
 github-super-linter() {
@@ -40,23 +40,12 @@ github-super-linter() {
   return "${result}"
 }
 
-rhad-lint() {
-  local result=0
-  docker run \
-    --rm -it \
-    -v "${PWD}":/home/rhad/src \
-    ghcr.io/opensourcecorp/rhad:latest \
-  lint \
-  || result="$?"
-  return "${result}"
-}
-
-rhad-test() {
+oscar-test() {
   printf 'Not implemented.\n'
   return 1
 }
 
-rhad-build() {
+oscar-build() {
   printf 'Not implemented.\n'
   return 1
 }
@@ -64,15 +53,14 @@ rhad-build() {
 case "${cmd}" in
   lint)
     github-super-linter
-    rhad-lint
   ;;
   test)
-    rhad-test
+    oscar-test
   ;;
   build)
-    rhad-build
+    oscar-build
   ;;
   *)
-    printf 'ERROR: must specify a valid rhad subcommand as script arg\n'
+    printf 'ERROR: must specify a valid oscar subcommand as script arg\n'
   ;;
 esac
