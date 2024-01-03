@@ -4,7 +4,7 @@ FROM debian:unstable
 ENV GOFLAGS -buildvcs=false
 
 # oscar will check for this to set its focus accordingly
-ENV RHAD_SRC '/home/oscar/oscar-src'
+ENV OSCAR_SRC '/home/oscar/oscar-src'
 
 WORKDIR /root
 
@@ -19,7 +19,7 @@ RUN mkdir -p \
       /home/oscar/.local/bin
 WORKDIR /home/oscar/oscar-src
 
-ENV RHAD_SRC=/home/oscar/oscar-src
+ENV OSCAR_SRC=/home/oscar/oscar-src
 
 # Set up PATH correctly for oscar user (I can't find a better way to do this)
 ENV PATH="/home/oscar/.local/bin:/home/oscar/go/bin:${PATH}"

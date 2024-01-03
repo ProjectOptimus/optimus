@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"regexp"
 
-	osc "github.com/opensourcecorp/go-common"
+	"github.com/sirupsen/logrus"
 )
 
 // fileData tracks info about discovered files
@@ -34,7 +34,7 @@ func getAllFiles(root string) []fileData {
 
 		fileInfo, err := os.Stat(path)
 		if err != nil {
-			osc.FatalLog(err, "Could not process filepath %s for some reason; error specifics below\n", path)
+			logrus.Fatalf("could not process filepath '%s': %v", path, err)
 		}
 
 		file := fileData{
@@ -48,7 +48,7 @@ func getAllFiles(root string) []fileData {
 	})
 
 	if err != nil {
-		osc.FatalLog(err, "There was an error processing the directory")
+		logrus.Fatalf("processing root directory '%s': %v", root, err)
 	}
 
 	return files

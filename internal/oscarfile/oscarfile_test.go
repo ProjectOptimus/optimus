@@ -8,14 +8,10 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	osc "github.com/opensourcecorp/go-common"
+	"github.com/sirupsen/logrus"
 )
 
 var testOscarfilePath, _ = filepath.Abs("../../testdata/config-file/Oscarfile")
-
-func init() {
-	osc.IsTesting = true
-}
 
 func TestReadOscarfile(t *testing.T) {
 	t.Run("Valid Oscarfile can be read", func(t *testing.T) {
@@ -43,20 +39,18 @@ func TestReadOscarfile(t *testing.T) {
 			t.Fatalf(err.Error())
 		}
 
-		// Have to temporarily turn off testing & redirect output so the logs
-		// get emitted, and to the right place
-		osc.IsTesting = false
-		osc.WarnLogger.SetOutput(&buf)
+		// Have to temporarily redirect output so the logs get emitted to the
+		// right place
+		logrus.SetOutput(&buf)
 		ReadOscarfile(badfilePath)
-		osc.WarnLogger.SetOutput(os.Stderr)
-		osc.IsTesting = true
+		logrus.SetOutput(os.Stderr)
 
 		logs := buf.String()
 		if err != nil {
 			t.Fatalf(err.Error())
 		}
 
-		match, err := regexp.MatchString(`WARN`, string(logs))
+		match, err := regexp.MatchString(`warning`, string(logs))
 		if err != nil {
 			t.Fatalf(err.Error())
 		}

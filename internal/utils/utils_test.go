@@ -11,32 +11,10 @@ func TestGetOscarSrc(t *testing.T) {
 		panic(err)
 	}
 
-	os.Setenv("RHAD_SRC", want)
+	os.Setenv("OSCAR_SRC", want)
 	got := GetOscarSrc()
 
 	if want != got {
 		t.Errorf("Want: %s, Got: %s\n", want, got)
 	}
-}
-
-func TestCheckIsTesting(t *testing.T) {
-	var isTesting bool
-
-	t.Run("oscar knows it's being tested", func(t *testing.T) {
-		os.Setenv("RHAD_TESTING", "true")
-		isTesting = CheckIsTesting()
-
-		if !isTesting {
-			t.Errorf("isTesting should have been TRUE based on set env var")
-		}
-	})
-
-	t.Run("oscar knows it's being tested", func(t *testing.T) {
-		os.Setenv("RHAD_TESTING", "")
-		isTesting = CheckIsTesting()
-
-		if isTesting {
-			t.Errorf("isTesting should have been FALSE based on unset/invalid env var")
-		}
-	})
 }

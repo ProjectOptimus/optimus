@@ -5,11 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
-	osc "github.com/opensourcecorp/go-common"
-	"github.com/spf13/cobra"
-
 	"github.com/opensourcecorp/oscar/internal/oscarfile"
+	"github.com/opensourcecorp/oscar/internal/subroutines/test"
 	"github.com/opensourcecorp/oscar/internal/utils"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -21,10 +21,10 @@ var (
 
 	rootCmd = &cobra.Command{
 		Use:   "oscar",
-		Short: "oscar: the CI/CD task runner for OpenSourceCorp",
+		Short: "oscar: the OpenSourceCorp Automation Runner",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
-			osc.FatalLog(nil, "oscar requires a subcommand")
+			logrus.Fatal("oscar requires a subcommand")
 		},
 	}
 )
@@ -33,6 +33,7 @@ func init() {
 	oscarSrc = utils.GetOscarSrc()
 
 	// rootCmd.AddCommand(lint.LintCmd)
+	rootCmd.AddCommand(test.Cmd)
 }
 
 func Execute() {
@@ -44,20 +45,20 @@ func Execute() {
 		// tree, so we can also use them as path names where we need to
 		modulePath, err := filepath.Abs(module)
 		if err != nil {
-			osc.FatalLog(err, "Error when construction absolute filepath to provided module '%s'", module)
+			logrus.Fatalf("constructing absolute filepath to provided module '%s': %v", module, err)
 		}
 		err = os.Chdir(modulePath)
 		if err != nil {
-			osc.FatalLog(err, "Could not set working directory to '%s' for oscar on startup", module)
+			logrus.Fatalf("could not set working directory to '%s' for oscar on startup: %v", module, err)
 		}
 
 		err = rootCmd.Execute()
 		if err != nil {
-			osc.FatalLog(err, "Unhandled error when executing oscar subcommands, caught at top-level")
+			logrus.Fatalf("unhandled error when executing oscar subcommands, caught at top-level: %v", err)
 		}
 	}
 	err = os.Chdir(oscarSrc)
 	if err != nil {
-		osc.FatalLog(err, "Could not reset working directory to oscar root '%s' for oscar on finish", oscarSrc)
+		logrus.Fatalf("could not reset working directory to oscar root '%s' for oscar on finish: %v", oscarSrc, err)
 	}
 }

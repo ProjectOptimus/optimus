@@ -5,14 +5,9 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	osc "github.com/opensourcecorp/go-common"
 )
 
 var testingRoot = "../../testdata/fsutils"
-
-func init() {
-	osc.IsTesting = true
-}
 
 func TestGetAllFiles(t *testing.T) {
 	var want, got []fileData

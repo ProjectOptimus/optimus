@@ -4,8 +4,10 @@ PKGNAME := oscar
 BINNAME := oscar
 
 DOCKER ?= docker
-OCI_REGISTRY ?= ghcr.io# ociregistry.opensourcecorp.org
-OCI_REGISTRY_OWNER ?= opensourcecorp# library
+# OCI_REGISTRY ?= ociregistry.opensourcecorp.org
+# OCI_REGISTRY_OWNER ?= library
+OCI_REGISTRY ?= ghcr.io
+OCI_REGISTRY_OWNER ?= opensourcecorp
 
 all: test clean
 
@@ -13,7 +15,7 @@ all: test clean
 
 test: clean
 	@printf 'Running go vet first...\n' && go vet ./... && printf 'Ok.\n'
-	@OSC_IS_TESTING=true go test -cover ./...
+	@go test -cover ./...
 
 build: clean
 	@mkdir -p build/$$(go env GOOS)-$$(go env GOARCH)
@@ -56,10 +58,3 @@ clean:
 # run 'make clean' within the container
 image-build: clean
 	@$(DOCKER) build -f Containerfile -t $(OCI_REGISTRY)/$(OCI_REGISTRY_OWNER)/$(PKGNAME):latest .
-
-# Some targets that help set up local workstations with oscar tooling. Assumes
-# ~/.local/bin is on $PATH
-add-local-symlinks:
-	@mkdir -p "${HOME}"/.local/bin
-	@ln -fs $(realpath ./scripts/oscar.sh) "${HOME}"/.local/bin/oscar
-	@printf 'Symlinked oscar runner script to %s\n' "${HOME}"/.local/bin/oscar

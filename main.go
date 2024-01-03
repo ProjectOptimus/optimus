@@ -5,21 +5,21 @@ import (
 
 	osc "github.com/opensourcecorp/go-common"
 	"github.com/opensourcecorp/oscar/cmd"
+	"github.com/sirupsen/logrus"
 )
 
+func init() {
+	logrus.SetFormatter(&logrus.TextFormatter{})
+}
+
 func main() {
-	osc.SetLoggerPrefixName("oscar")
-
-	osc.InfoLog("Firing up oscar!")
-
 	banner := osc.Dedent(`
-		  ______________________________
-		 /                             /|
-		|/   __   |      __      __ | |/|
-		|/  /  \  |__   /  \    /  \| |/|
-		|/ |      |  \ |    \  |    | |/|
-		|/ |      |  |  \__/\   \__/| |/|
-		|/____________________________|/
+		   ____________________
+		 /____________________/|
+		|  _   _   _  _   _  |/|
+		| | | |_  |  |_| |_| |/|
+		| |_|  _| |_ | | | \ |/|
+		|____________________|/
 	`)
 	fmt.Println(banner)
 

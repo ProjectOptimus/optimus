@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	osc "github.com/opensourcecorp/go-common"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/mod/semver"
 )
 
@@ -44,11 +44,11 @@ func getSemver(s string) string {
 	}
 
 	if !semver.IsValid(v) {
-		osc.FatalLog(nil, "Could not understand the semantic version you provided in your Oscarfile: '%s'", s)
+		logrus.Fatalf("Could not understand the semantic version you provided in your Oscarfile: '%s'", s)
 	}
 
 	if v != s {
-		osc.WarnLog("The Semantic Version string built was different from the one provided -- please edit your version to match the correct format: %s --> %s", s, v)
+		logrus.Warnf("The Semantic Version string built was different from the one provided -- please edit your version to match the correct format: %s --> %s", s, v)
 	}
 
 	return v

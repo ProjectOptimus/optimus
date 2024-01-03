@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
-	osc "github.com/opensourcecorp/go-common"
+	"github.com/sirupsen/logrus"
 )
 
 // A Oscarfile represents all sections (oscarModules) together in a real Oscarfile
@@ -37,12 +37,12 @@ func ReadOscarfile(customOscarfilePath ...string) (Oscarfile, toml.MetaData) {
 
 	oscarfilePath, err = filepath.Abs(oscarfilePath)
 	if err != nil {
-		osc.FatalLog(err, "Error when determining the absolute path of ./Oscarfile")
+		logrus.Fatalf("determining the absolute path of ./Oscarfile: %v", err)
 	}
 
 	_, err = os.Lstat(oscarfilePath)
 	if err != nil {
-		osc.WarnLog("No Oscarfile found, so oscar will only process this root directory, and without configuration options. Create a top-level 'Oscarfile' with a '[module.root]' TOML table.")
+		logrus.Warn("No Oscarfile found, so oscar will only process this root directory, and without configuration options. You should create a top-level 'Oscarfile' with a '[module.root]' TOML table.")
 		// This is a "default" Oscarfile -- we need to return one or else the
 		// outer loop in the caller will fail to run without any error. The
 		// module path for a single-level Oscarfile can either be "root" or ".",
@@ -55,20 +55,20 @@ func ReadOscarfile(customOscarfilePath ...string) (Oscarfile, toml.MetaData) {
 	} else {
 		metadata, err = toml.DecodeFile(oscarfilePath, &oscarfileData)
 		if err != nil {
-			osc.FatalLog(err, "Error while reading or parsing Oscarfile")
+			logrus.Fatalf("reading or parsing Oscarfile: %v", err)
 		}
 
 		// Another catch for when oscar may fail entirely silently -- typos like
 		// specifying module blocks in TOML as 'modules.X' instead of
 		// 'module.X', etc.
 		if len(metadata.Undecoded()) > 0 {
-			osc.WarnLog("Undecoded field in Oscarfile detected, and oscar may break -- you might have made a typo somewhere. Undecoded fields: %q", metadata.Undecoded())
+			logrus.Warnf("Undecoded field in Oscarfile detected, and oscar may break -- you might have made a typo somewhere. Undecoded fields: %q", metadata.Undecoded())
 		}
 
 		// Here's where we need to replace a possible 'root' module path key
 		// with a real resolvable directory name
 		if _, ok := oscarfileData.Modules["root"]; ok {
-			osc.InfoLog("Found 'root' module name in Oscarfile -- will treat that as the top-level directory '.'")
+			logrus.Info("Found 'root' module name in Oscarfile -- will treat that as the top-level directory '.'")
 			oscarfileData.Modules["."] = oscarfileData.Modules["root"]
 			delete(oscarfileData.Modules, "root")
 		}

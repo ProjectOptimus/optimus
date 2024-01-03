@@ -46,10 +46,10 @@ init-go() {
 
 init-python() {
   local pkgs=(
-    pytest
-    pytest-cov
+    python3-pytest
+    python3-pytest-cov
   )
-  pip3 install --user "${pkgs[@]}" \
+  apt-get install -y "${pkgs[@]}" \
   || errorf "Could not init Python packages for oscar!"
 }
 

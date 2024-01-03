@@ -6,12 +6,12 @@ import (
 	"regexp"
 	"testing"
 
-	osc "github.com/opensourcecorp/go-common"
+	"github.com/stretchr/testify/require"
 )
 
 var (
 	// Used when no specific TrackerRecord is needed; we just need something to show up in the tracker file
-	basicTestTrackerRecord = TrackerRecord{
+	basicTestTrackerRecord = Record{
 		Type:     "lint",
 		Subtype:  "fmt-diff-check",
 		Language: "go",
@@ -20,10 +20,6 @@ var (
 	}
 )
 
-func init() {
-	osc.IsTesting = true
-}
-
 func TestInitTracker(t *testing.T) {
 	if _, err := os.Stat(trackerPath); errors.Is(err, os.ErrNotExist) {
 		t.Errorf("oscar tracker file does not exist -- it should have been created at init time")
@@ -31,17 +27,13 @@ func TestInitTracker(t *testing.T) {
 }
 
 func TestWriteTrackerRecord(t *testing.T) {
-	WriteTrackerRecord(basicTestTrackerRecord)
+	WriteRecord(basicTestTrackerRecord)
 	// Raw bytes read instead of getTrackerData(), so we can a) test the bytes
 	// written and b) debug if getTrackerData() tests fail
 	trackerFileBytes, err := os.ReadFile(trackerPath)
-	if err != nil {
-		osc.FatalLog(err, "Couldn't read from oscar's tracker file during test")
-	}
+	require.NoError(t, err)
 	hasResult, err := regexp.Match(`"result": ?"fail"`, trackerFileBytes)
-	if err != nil {
-		osc.FatalLog(err, "Bad regex spec during test")
-	}
+	require.NoError(t, err)
 	if !hasResult {
 		t.Errorf(
 			"\nWritten tracker record does not have expected contents -- review file contents below:\n%v",
@@ -53,7 +45,7 @@ func TestWriteTrackerRecord(t *testing.T) {
 }
 
 func TestGetTrackerData(t *testing.T) {
-	WriteTrackerRecord(basicTestTrackerRecord)
+	WriteRecord(basicTestTrackerRecord)
 	trackerData := GetTrackerData()
 	if trackerData[0].Type != "lint" {
 		t.Errorf("Expected tracker record field 'Type' to be 'lint', but got '%v'", trackerData[0].Type)
@@ -78,7 +70,7 @@ func TestGetTrackerData(t *testing.T) {
 }
 
 func TestCheckTrackerFailures(t *testing.T) {
-	WriteTrackerRecord(basicTestTrackerRecord)
+	WriteRecord(basicTestTrackerRecord)
 	trackerData := GetTrackerData()
 	gotFailures := CheckTrackerFailures(trackerData, "lint")
 	wantFailures := 1
