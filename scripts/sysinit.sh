@@ -79,9 +79,9 @@ main() {
   if [[ $(id -u) -eq 0 ]]; then
     init-sys
     init-bats
+    init-python
   else
     init-go
-    init-python
 
     # Also run tests as nonroot, so setup is confirmed for the least-privileged user
     test-sysinit
