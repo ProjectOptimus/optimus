@@ -57,4 +57,8 @@ clean:
 # clean as a dep because of mounted volume permissions issues when it tries to
 # run 'make clean' within the container
 image-build: clean
-	@$(DOCKER) build -f Containerfile -t $(OCI_REGISTRY)/$(OCI_REGISTRY_OWNER)/$(PKGNAME):latest .
+	@$(DOCKER) build \
+		--progress plain \
+		-f Containerfile \
+		-t $(OCI_REGISTRY)/$(OCI_REGISTRY_OWNER)/$(PKGNAME):latest \
+		.

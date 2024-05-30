@@ -3,19 +3,12 @@
   remote_user: 'root'
   hosts: 'localhost'
   tasks:
-    - name: 'Create oscar user'
-      ansible.builtin.user:
-        name: 'oscar'
-        state: 'present'
-        create_home: true
-    - name: 'Create oscar source code directory'
-      ansible.builtin.file:
-        path: '/home/oscar/src'
-        state: 'directory'
-        mode: 'preserve'
+
     - name: 'Update APT cache'
       ansible.builtin.apt:
         update_cache: true
+      tags: [core]
+
     - name: 'Install system packages'
       ansible.builtin.apt:
         pkg:
@@ -30,26 +23,56 @@
           - python3-pytest
           - python3-pytest-cov
           - python3-venv
+          - sudo
         autoclean: true
         autoremove: true
+      tags: [core]
+
+    - name: 'Create oscar user'
+      ansible.builtin.user:
+        name: 'oscar'
+        state: 'present'
+        create_home: true
+      tags: [core]
+
+    - name: 'Create oscar directories'
+      become: true
+      become_user: 'oscar'
+      ansible.builtin.file:
+        path: '/home/oscar/{{ item }}'
+        state: 'directory'
+        mode: '0755'
+      loop:
+        - 'src' # for mounted source code
+        - 'oscar-src' # for oscar's own source code
+      tags: [core]
+
     - name: 'Clone bats'
       ansible.builtin.git:
         repo: 'https://github.com/bats-core/bats-core.git'
         dest: '/tmp/bats'
         version: 'v1.11.0'
+      tags: [testers]
+
     - name: 'Install bats'
       ansible.builtin.command:
         cmd: 'bash /tmp/bats/install.sh /usr/local'
         creates: '/usr/local/bin/bats'
-    - name: Add to PATH
-      ansible.builtin.copy:
-        content: 'export PATH=/home/oscar/go/bin:${PATH}'
-        dest: '/etc/profile.d/custom_path.sh'
-        owner: 'oscar'
-        mode: '755'
+      tags: [testers]
+
+    # # TODO: this does not work
+    # - name: Add to PATH
+    #   ansible.builtin.copy:
+    #     content: 'export PATH=/home/oscar/go/bin:${PATH}'
+    #     dest: '/etc/profile.d/custom_path.sh'
+    #     owner: 'oscar'
+    #     mode: '0644'
+    #   tags: [core]
+
     - name: 'Ensure oscar homedir permissions'
       ansible.builtin.file:
         path: '/home/oscar'
         owner: 'oscar'
         group: 'oscar'
         recurse: true
+      tags: [core]
