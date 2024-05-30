@@ -11,9 +11,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var testOscarfilePath, _ = filepath.Abs("../../testdata/config-file/Oscarfile")
+var testOscarfilePath, _ = filepath.Abs("../../testdata/config_file/Oscarfile")
 
-func TestReadOscarfile(t *testing.T) {
+func TestRead(t *testing.T) {
 	t.Run("Valid Oscarfile can be read", func(t *testing.T) {
 		want := Oscarfile{
 			Modules: map[string]oscarModule{
@@ -22,7 +22,7 @@ func TestReadOscarfile(t *testing.T) {
 				"datastore":  {Version: "v0.2.0"},
 			},
 		}
-		got, _ := ReadOscarfile(testOscarfilePath)
+		got, _ := Read(testOscarfilePath)
 
 		if !cmp.Equal(want, got) {
 			t.Errorf("\nDid not match expected Oscarfile contents:\nwant: %v\ngot: %v", want, got)
@@ -34,7 +34,7 @@ func TestReadOscarfile(t *testing.T) {
 
 		var buf bytes.Buffer
 
-		badfilePath, err := filepath.Abs("../testdata/config-file/Oscarfile_invalid")
+		badfilePath, err := filepath.Abs("../testdata/config_file/Oscarfile_invalid")
 		if err != nil {
 			t.Fatalf(err.Error())
 		}
@@ -42,7 +42,7 @@ func TestReadOscarfile(t *testing.T) {
 		// Have to temporarily redirect output so the logs get emitted to the
 		// right place
 		logrus.SetOutput(&buf)
-		ReadOscarfile(badfilePath)
+		Read(badfilePath)
 		logrus.SetOutput(os.Stderr)
 
 		logs := buf.String()

@@ -18,12 +18,12 @@ type oscarModule struct {
 	Version string `toml:"version"`
 }
 
-// ReadOscarfile reads in the Oscarfile provided, and unpacks it into something
-// usable elsewhere. Currently, Oscarfiles are in the TOML format. The hacky
+// Read reads in the Oscarfile provided, and unpacks it into something usable
+// elsewhere. Currently, Oscarfiles are in the TOML format. The hacky
 // `oscarfilePath` parameter allows for internal setting of the Oscarfile path
 // (such as during tests), but will default to searching the current directory
 // if not provided.
-func ReadOscarfile(customOscarfilePath ...string) (Oscarfile, toml.MetaData) {
+func Read(customOscarfilePath ...string) (Oscarfile, toml.MetaData) {
 	var err error
 	var oscarfileData Oscarfile
 	var metadata toml.MetaData

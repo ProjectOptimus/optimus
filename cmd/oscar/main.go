@@ -1,5 +1,5 @@
-// Package cmd implements the CLI logic for oscar
-package cmd
+// Package oscar implements the CLI logic for oscar
+package oscar
 
 import (
 	"os"
@@ -17,7 +17,7 @@ var (
 	// up paths relative to the binary, etc
 	oscarSrc string
 
-	rf oscarfile.Oscarfile
+	oscfile oscarfile.Oscarfile
 
 	rootCmd = &cobra.Command{
 		Use:   "oscar",
@@ -39,8 +39,8 @@ func init() {
 func Execute() {
 	var err error
 
-	rf, _ = oscarfile.ReadOscarfile()
-	for module := range rf.Modules {
+	oscfile, _ = oscarfile.Read()
+	for module := range oscfile.Modules {
 		// Oscarfile section keys are relative-path subdirectory names in the
 		// tree, so we can also use them as path names where we need to
 		modulePath, err := filepath.Abs(module)

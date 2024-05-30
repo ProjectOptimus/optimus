@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	osc "github.com/opensourcecorp/go-common"
-	"github.com/opensourcecorp/oscar/cmd"
+	"github.com/opensourcecorp/oscar/cmd/oscar"
 	"github.com/sirupsen/logrus"
 )
 
@@ -23,5 +23,5 @@ func main() {
 	`)
 	fmt.Println(banner)
 
-	cmd.Execute()
+	oscar.Execute()
 }

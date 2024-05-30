@@ -1,0 +1,55 @@
+---
+- name: 'Host initialization'
+  remote_user: 'root'
+  hosts: 'localhost'
+  tasks:
+    - name: 'Create oscar user'
+      ansible.builtin.user:
+        name: 'oscar'
+        state: 'present'
+        create_home: true
+    - name: 'Create oscar source code directory'
+      ansible.builtin.file:
+        path: '/home/oscar/src'
+        state: 'directory'
+        mode: 'preserve'
+    - name: 'Update APT cache'
+      ansible.builtin.apt:
+        update_cache: true
+    - name: 'Install system packages'
+      ansible.builtin.apt:
+        pkg:
+          - build-essential
+          - curl
+          - golang
+          - git
+          - make
+          - nano
+          - python3
+          - python3-pip
+          - python3-pytest
+          - python3-pytest-cov
+          - python3-venv
+        autoclean: true
+        autoremove: true
+    - name: 'Clone bats'
+      ansible.builtin.git:
+        repo: 'https://github.com/bats-core/bats-core.git'
+        dest: '/tmp/bats'
+        version: 'v1.11.0'
+    - name: 'Install bats'
+      ansible.builtin.command:
+        cmd: 'bash /tmp/bats/install.sh /usr/local'
+        creates: '/usr/local/bin/bats'
+    - name: Add to PATH
+      ansible.builtin.copy:
+        content: 'export PATH=/home/oscar/go/bin:${PATH}'
+        dest: '/etc/profile.d/custom_path.sh'
+        owner: 'oscar'
+        mode: '755'
+    - name: 'Ensure oscar homedir permissions'
+      ansible.builtin.file:
+        path: '/home/oscar'
+        owner: 'oscar'
+        group: 'oscar'
+        recurse: true
